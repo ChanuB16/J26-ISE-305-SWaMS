@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% from "_macros.html" import icon %}
+{% block title %}Bin {{ bin_id }}{% endblock %}
+{% block content %}
+<div id="err"></div>
+<div class="row between mb">
+  <div>
+    <a href="/officer/bins" class="small">← All bins</a>
+    <h2 id="name" style="font-size:20px;margin-top:4px">{{ bin_id }}</h2>
+    <div class="row small muted" id="meta">Loading…</div>
+  </div>
+  <div class="row" id="topPills"></div>
+</div>
+<div class="grid g3">
+  <div class="card">
+    <h2>Fill level now</h2>
+    <div class="ring-wrap" id="now"></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><h2>ML prediction (6 hours ahead)</h2></div>
+    <div id="pred"></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><h2>Collection urgency</h2><span id="urgPill"></span></div>
+    <div id="urg"></div>
+  </div>
+</div>
+<div class="card mt">
+  <div class="card-head"><h2>Sensors</h2><span class="muted small" id="sensTime"></span></div>
+  <div class="tiles" id="sensors"></div>
+</div>
+<div class="grid g2 mt">
+  <div class="card"><h2>Warnings for this bin</h2><div id="alerts"></div></div>
+  <div class="card"><h2>If this bin is full: nearest bin with space</h2><p class="sub" id="nearRule"></p><div id="near"></div></div>
+</div>
+
+<div class="card mt" id="historyCard">
+  <div class="card-head">
+    <h2>History</h2>
+    <div class="row">
+      <div class="seg" id="range">
+        <button data-v="6h">6 h</button><button data-v="24h" class="on">24 h</button><button data-v="3d">3 days</button><button data-v="7d">7 days</button>
+      </div>
+      <input type="date" id="day" aria-label="Pick a day" style="width:auto">
+      <a class="btn ghost small" id="csv" href="#">{{ icon("download") }} CSV (all readings)</a>
+    </div>
+  </div>
+  <p class="sub" id="histInfo"></p>
+  <div class="tiles mb" id="stats"></div>
+  <h3>Fill level (%)</h3>
+  <div id="chFill" class="mb"></div>
+  <div class="grid g2">
+    <div><h3>Weight (kg)</h3><div id="chWeight"></div></div>
+    <div><h3>Gas / smell index (0–100)</h3><div id="chGas"></div></div>
+    <div><h3>Temperature (°C)</h3><div id="chTemp"></div></div>
+    <div><h3>Humidity (%)</h3><div id="chHum"></div></div>
+    <div><h3>Battery (%)</h3><div id="chBat"></div></div>
+    <div><h3>On-bin urgency score</h3><div id="chUrg"></div></div>
+  </div>
+  <div class="card-head mt"><h3>All readings (newest first)</h3><div class="row small" id="pager"></div></div>
+  <div class="tbl-wrap" id="histTable"></div>
+</div>
+
+<div class="grid g2 mt">
+  <div class="card"><div class="card-head"><h2>Emptying history</h2><span class="muted small" id="colCount"></span></div><div class="scroll" id="collections"></div></div>
+  <div class="card"><h2>Device and calibration</h2><div id="device"></div></div>
+</div>
+{% endblock %}
+{% block scripts %}<script>window.BIN_ID = {{ bin_id|tojson }};</script><script type="module" src="/static/js/pages/officer_bin.js?v={{ version }}"></script>{% endblock %}

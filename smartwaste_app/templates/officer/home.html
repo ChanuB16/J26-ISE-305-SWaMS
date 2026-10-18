@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+<div id="err"></div>
+<div class="row between mb">
+  <div><h2 id="hello" style="font-size:18px">&nbsp;</h2><div class="muted small" id="sub">Loading…</div></div>
+  <div class="row"><a class="btn ghost small" href="/officer/bins">All bins</a><a class="btn small" href="/officer/reports">Download report</a></div>
+</div>
+<div class="grid g4" id="kpis"></div>
+<div class="grid g-main mt">
+  <div class="card">
+    <div class="card-head"><h2>Live bin map</h2><a class="small" href="/officer/routes">Routes map →</a></div>
+    <div id="legend" class="mb"></div>
+    <div class="map tall" id="map"></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><h2>Early warnings</h2><span id="alertCount"></span></div>
+    <p class="sub">From the sensors and the ML predictions. Newest data every {{ cfg.refresh }} s.</p>
+    <div id="alerts" style="max-height:560px;overflow:auto"></div>
+  </div>
+</div>
+<div class="grid g-main mt">
+  <div class="card">
+    <div class="card-head"><h2>Most urgent bins</h2><span class="muted small">Urgency = 0.5 × predicted fill + 0.2 × gas + 0.1 × humidity + 0.2 × time since emptied</span></div>
+    <div class="scroll" id="urgent"></div>
+  </div>
+  <div class="card">
+    <h2>Bins by fill level</h2>
+    <div id="levels"></div>
+    <h2 class="mt" style="margin-bottom:8px">Community</h2>
+    <div id="community"></div>
+  </div>
+</div>
+<div class="grid g2 mt">
+  <div class="card">
+    <div class="card-head"><h2>Waste forecast, next 7 days</h2><a class="small" href="/officer/forecast">Details →</a></div>
+    <div id="fcInfo" class="sub"></div>
+    <div id="fcChart"></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><h2>Today's truck routes</h2><a class="small" href="/officer/routes">Open routes →</a></div>
+    <div id="routes"></div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}<script type="module" src="/static/js/pages/officer_home.js?v={{ version }}"></script>{% endblock %}

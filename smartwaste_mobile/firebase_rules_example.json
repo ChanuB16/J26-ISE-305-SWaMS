@@ -1,0 +1,9 @@
+{
+  "_comment": "SmartWaste LK — recommended Realtime Database rules.",
+  "_comment_2": "Keep this file; paste the body into Firebase Console > Realtime Database > Rules.",
+  "_comment_3": "This matches what the Flask app expects: wide-open for prototyping. For a real deployment switch USE_LOGIN=true + add auth != null checks.",
+  "rules": {
+    ".read": true,
+    ".write": true
+  }
+}

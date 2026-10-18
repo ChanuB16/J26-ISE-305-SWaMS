@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% from "_macros.html" import icon %}
+{% block content %}
+<div id="err"></div>
+<div id="plannerWarn"></div>
+<div class="filters">
+  <label class="small" for="date">Day</label>
+  <select id="date" aria-label="Day" style="width:auto"></select>
+  <span class="muted small" id="planInfo"></span>
+  <span style="flex:1"></span>
+  <a class="btn ghost small" id="csv" href="/api/export/routes.csv">{{ icon("download") }} CSV</a>
+</div>
+<div class="grid g4 mb" id="kpis"></div>
+<div class="grid g-main">
+  <div class="card">
+    <div class="card-head">
+      <h2>Route map</h2>
+      <div class="row" id="tools">
+        <button class="btn ghost small" id="btnClosure" title="Then click the road on the map">{{ icon("road") }} Road closed</button>
+        <button class="btn ghost small" id="btnJam" title="Then click the road on the map">{{ icon("clock") }} Traffic jam</button>
+        <button class="btn ghost small" id="btnClear">Open all roads</button>
+        <button class="btn small" id="btnReplan">{{ icon("refresh") }} Re-plan now</button>
+      </div>
+    </div>
+    <div class="msg" id="msg" role="status"></div>
+    <div class="map tall" id="map"></div>
+    <div class="legend mt" id="legend"></div>
+  </div>
+  <div class="stack">
+    <div class="card"><h2>Road problems</h2><div id="traffic"></div></div>
+    <div class="card"><h2>Not collected today</h2><div id="skipped"></div></div>
+    <div class="card"><h2>Emptied today</h2><div id="emptied"></div></div>
+  </div>
+</div>
+<h2 class="mt mb" style="margin-top:18px">Trucks and stop timelines</h2>
+<div class="grid g2" id="trucks"></div>
+{% endblock %}
+{% block scripts %}<script type="module" src="/static/js/pages/officer_routes.js?v={{ version }}"></script>{% endblock %}

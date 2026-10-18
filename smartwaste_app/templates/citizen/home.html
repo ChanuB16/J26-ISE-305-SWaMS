@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% from "_macros.html" import icon %}
+{% block title %}Hello, {{ user.name }}{% endblock %}
+{% block content %}
+<div id="err"></div>
+<div id="busy"></div>
+<div class="grid g-main">
+  <div class="stack">
+    <div class="card hero">
+      <h2 style="font-size:19px">Find a smart bin with space</h2>
+      <p class="muted" style="margin:6px 0 12px">We look for the nearest bin that is less than {{ cfg.space }}% full now and will not be full in the next 6 hours.</p>
+      <div class="row"><button class="btn" id="locBtn" style="background:#fff;color:#154d2b;border-color:#fff">{{ icon("pin") }} Use my location</button><span class="small" style="color:#cfe6d6">or tap the map where you are</span></div>
+    </div>
+    <div id="result"></div>
+    <div class="card"><div class="card-head"><h2>Smart bins near you</h2><span id="legend"></span></div><div class="map" id="map"></div></div>
+  </div>
+  <div class="stack">
+    <div class="card"><h2>Quick actions</h2>
+      <div class="qa mt">
+        <a href="/citizen/report">{{ icon("alert") }}Report a problem</a>
+        <a href="/citizen/rewards">{{ icon("gift") }}My rewards</a>
+        <a href="/usability">{{ icon("star") }}Rate this app</a>
+      </div>
+    </div>
+    <div class="card"><div class="card-head"><h2>My green points</h2><a class="small" href="/citizen/rewards">Details →</a></div><div id="points"></div></div>
+    <div class="card"><h2>Nearby bins</h2><p class="sub" id="nearSub">Share your location to sort by distance.</p><div id="list"></div></div>
+    <div class="card"><h2>Today's tips</h2><div id="tips"></div></div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}<script type="module" src="/static/js/pages/citizen_home.js?v={{ version }}"></script>{% endblock %}

@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Smart Waste Dashboard</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="config.js"></script>
+<style>
+  :root {
+    --surface: #fcfcfb; --page: #f6f5f2; --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+    --grid: #e1e0d9; --axis: #c3c2b7; --blue: #2a78d6; --orange: #eb6834;
+    --good: #0ca30c; --warning: #fab219; --serious: #ec835a; --critical: #d03b3b;
+    --ring: rgba(11,11,11,0.10);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink);
+         font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px; }
+  header { background: var(--surface); border-bottom: 1px solid var(--grid); padding: 12px 20px 0; position: sticky;
+           top: 0; z-index: 1000; }
+  .top { display: flex; gap: 16px; align-items: baseline; flex-wrap: wrap; }
+  h1 { font-size: 18px; margin: 0; }
+  #status { color: var(--ink-2); font-size: 13px; }
+  #status.bad { color: var(--critical); font-weight: 600; }
+  .badge { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 12px; background: #fff3d6;
+           color: #7a5200; border: 1px solid #f3d58b; }
+  nav { display: flex; gap: 4px; margin-top: 10px; flex-wrap: wrap; }
+  nav button { border: none; background: none; padding: 9px 14px; font: inherit; color: var(--ink-2); cursor: pointer;
+               border-bottom: 3px solid transparent; }
+  nav button.on { color: var(--ink); font-weight: 600; border-bottom-color: var(--blue); }
+  main { padding: 16px 20px 40px; max-width: 1400px; margin: 0 auto; }
+  section { display: none; }
+  section.on { display: block; }
+  .row { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 16px; }
+  @media (max-width: 900px) { .row { grid-template-columns: 1fr; } }
+  .card { background: var(--surface); border: 1px solid var(--ring); border-radius: 10px; padding: 14px 16px; }
+  .card h2 { font-size: 15px; margin: 0 0 4px; }
+  .sub { color: var(--ink-2); font-size: 12.5px; margin: 0 0 10px; }
+  .map { height: 520px; border-radius: 8px; border: 1px solid var(--grid); }
+  .nomap { height: 520px; display: flex; align-items: center; justify-content: center; color: var(--ink-2);
+           border: 1px dashed var(--axis); border-radius: 8px; text-align: center; padding: 20px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; color: var(--ink-2); font-weight: 600; border-bottom: 1px solid var(--grid); padding: 6px 6px; }
+  td { border-bottom: 1px solid var(--grid); padding: 6px 6px; font-variant-numeric: tabular-nums; }
+  tr.click { cursor: pointer; }
+  tr.click:hover td { background: #f3f2ee; }
+  tr.sel td { background: #eaf2fc; }
+  .bar { position: relative; height: 10px; width: 90px; background: #efeee9; border-radius: 5px; display: inline-block;
+         vertical-align: middle; margin-right: 6px; }
+  .bar span { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 5px; }
+  .pill { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 12px; border: 1px solid var(--grid); }
+  .pill.good { color: #006300; border-color: #9fd59f; background: #eef8ee; }
+  .pill.warning { color: #7a5200; border-color: #f3d58b; background: #fff8e6; }
+  .pill.critical { color: #9e1f1f; border-color: #eba5a5; background: #fdeeee; }
+  .pill.muted { color: var(--ink-2); }
+  .grid3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+  .btns { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0 10px; }
+  button.act { font: inherit; padding: 6px 12px; border-radius: 6px; border: 1px solid var(--axis); background: #fff;
+               cursor: pointer; }
+  button.act:hover { background: #f3f2ee; }
+  button.act.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .note { color: var(--ink-2); font-size: 12.5px; }
+  .msg { margin-top: 8px; font-size: 13px; color: var(--blue); min-height: 18px; }
+  .stops { margin: 6px 0 0; padding-left: 18px; }
+  .stops li { margin: 2px 0; }
+  .done { color: var(--muted); text-decoration: line-through; }
+  .tip { margin: 4px 0; padding: 6px 10px; border-left: 3px solid var(--blue); background: #f5f8fd; border-radius: 4px; }
+  svg text { font-family: inherit; }
+  .tooltip { position: fixed; pointer-events: none; background: var(--ink); color: #fff; padding: 5px 8px; border-radius: 5px;
+             font-size: 12px; display: none; z-index: 2000; }
+  .numicon { background: var(--ink); color: #fff; border-radius: 50%; width: 22px; height: 22px; line-height: 22px;
+             text-align: center; font-size: 11px; font-weight: 700; border: 2px solid #fff; }
+  .truckicon { background: var(--orange); color: #fff; border-radius: 4px; padding: 1px 4px; font-size: 11px;
+               font-weight: 700; border: 2px solid #fff; white-space: nowrap; }
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <h1>Smart Waste Dashboard – Kaduwela</h1>
+    <span id="status">Connecting…</span>
+    <span id="synthetic" class="badge" style="display:none">Contains synthetic demo data</span>
+  </div>
+  <nav>
+    <button data-tab="bins" class="on">Bins (live)</button>
+    <button data-tab="forecast">Waste forecast</button>
+    <button data-tab="routes">Truck routes</button>
+    <button data-tab="rewards">Rewards &amp; crew tips</button>
+  </nav>
+</header>
+<main>
+  <!-- ============ BINS (Component 2) ============ -->
+  <section id="bins" class="on">
+    <div class="row">
+      <div class="card">
+        <h2>Bins on the map</h2>
+        <p class="sub">Colour = how full now: green below 50%, yellow 50–79%, red 80% or more.
+          Click anywhere on the map to find the nearest bin with space.</p>
+        <div id="binsMap" class="map"></div>
+        <div id="nearestMsg" class="msg"></div>
+      </div>
+      <div class="card">
+        <h2>All bins</h2>
+        <p class="sub">Sorted by urgency score (Part B). Click a bin to see its fill level over the last 24 hours.</p>
+        <div style="overflow-x:auto"><table id="binsTable"></table></div>
+        <div id="binDetail" style="margin-top:14px"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FORECAST (Component 3) ============ -->
+  <section id="forecast">
+    <div class="card" style="margin-bottom:16px">
+      <h2>Waste forecast for the next 7 days</h2>
+      <p class="sub" id="fcInfo">Tonnes per area per day (step F3).</p>
+      <div style="overflow-x:auto"><table id="fcTable"></table></div>
+    </div>
+    <div class="grid3" id="fcCharts"></div>
+  </section>
+
+  <!-- ============ ROUTES (Component 3) ============ -->
+  <section id="routes">
+    <div class="row">
+      <div class="card">
+        <h2>Today's routes</h2>
+        <p class="sub" id="routeInfo">Made by r3_live_routes.py (keep it running).</p>
+        <div class="btns">
+          <button class="act" id="btnClose">Close a road (click the map)</button>
+          <button class="act" id="btnJam">Traffic jam (click the map)</button>
+          <button class="act" id="btnClear">Open all roads again</button>
+          <button class="act" id="btnReplan">Re-plan now</button>
+        </div>
+        <div id="routesMap" class="map"></div>
+        <div id="routeMsg" class="msg"></div>
+      </div>
+      <div class="card">
+        <h2>Trucks</h2>
+        <p class="sub">The planner checks Firebase every 15 seconds, so a change shows here within about half a minute.</p>
+        <div id="routeSummary"></div>
+        <div id="truckCards"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ REWARDS + TIPS ============ -->
+  <section id="rewards">
+    <div class="row">
+      <div class="card">
+        <h2>Citizen rewards</h2>
+        <p class="sub">+10 for a waste photo (Component 1), +5 for a full-bin report confirmed by the bin's sensor,
+          x2 on forecast busy days (step E1).</p>
+        <table id="board"></table>
+        <h2 style="margin-top:16px">Latest points</h2>
+        <table id="history"></table>
+      </div>
+      <div class="card">
+        <h2>Tips for the collection crews</h2>
+        <p class="sub">Made by rules switched on by the forecast, the holiday calendar and events (step E2).</p>
+        <div id="tips"></div>
+      </div>
+    </div>
+  </section>
+</main>
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+"use strict";
+const CFG = Object.assign({firebaseUrl: "", apiKey: "", email: "", password: "", depot: [6.933, 79.983],
+                           refreshSeconds: 15}, window.DASHBOARD_CONFIG || {});
+const qs = new URLSearchParams(location.search);
+if (qs.get("db")) CFG.firebaseUrl = qs.get("db");
+const DB = (CFG.firebaseUrl || "").replace(/\/+$/, "");
+const TRUCK_COLORS = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100"];
+const S = {bins: {}, info: {}, preds: {}, routes: {}, trucks: {}, traffic: {}, forecasts: {}, rewards: {},
+           guidance: {}, selected: null, mode: null, synthetic: false};
+let token = null, tokenTime = 0;
+
+// ---------------- helpers ----------------
+const $ = id => document.getElementById(id);
+function esc(x) { return String(x ?? "").replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c])); }
+function pad(n) { return String(n).padStart(2, "0"); }
+function hhmm(ms) { if (!ms) return "–"; const d = new Date(Number(ms)); return pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds()); }
+function ago(ms) {
+  if (!ms) return "no data";
+  const m = (Date.now() - Number(ms)) / 60000;
+  if (m < 1) return "just now";
+  if (m < 60) return Math.round(m) + " min ago";
+  if (m < 48 * 60) return Math.round(m / 60) + " h ago";
+  return Math.round(m / 1440) + " days ago";
+}
+function localDate(offsetDays = 0) {
+  const d = new Date(Date.now() + offsetDays * 86400000);
+  return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+}
+function fillLevel(f) {
+  if (f == null || isNaN(f)) return {cls: "muted", color: "#898781", label: "no data"};
+  if (f >= 80) return {cls: "critical", color: "#d03b3b", label: "full"};
+  if (f >= 50) return {cls: "warning", color: "#fab219", label: "half"};
+  return {cls: "good", color: "#0ca30c", label: "has space"};
+}
+function km(lat1, lng1, lat2, lng2) {
+  const r = Math.PI / 180, a = Math.sin((lat2 - lat1) * r / 2) ** 2 +
+    Math.cos(lat1 * r) * Math.cos(lat2 * r) * Math.sin((lng2 - lng1) * r / 2) ** 2;
+  return 12742 * Math.asin(Math.sqrt(a));
+}
+const tip = $("tooltip");
+function showTip(e, html) { tip.innerHTML = html; tip.style.display = "block"; tip.style.left = (e.clientX + 12) + "px"; tip.style.top = (e.clientY + 12) + "px"; }
+function hideTip() { tip.style.display = "none"; }
+
+// ---------------- Firebase REST ----------------
+async function auth() {
+  if (!CFG.email || !CFG.password || !CFG.apiKey) return null;
+  if (token && Date.now() - tokenTime < 50 * 60000) return token;
+  const r = await fetch("https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=" + CFG.apiKey,
+    {method: "POST", headers: {"Content-Type": "application/json"},
+     body: JSON.stringify({email: CFG.email, password: CFG.password, returnSecureToken: true})});
+  if (!r.ok) throw new Error("Login failed - check apiKey, email and password in config.js");
+  token = (await r.json()).idToken; tokenTime = Date.now();
+  return token;
+}
+async function url(path, query = {}) {
+  const t = await auth();
+  const q = new URLSearchParams(query);
+  if (t) q.set("auth", t);
+  const s = q.toString();
+  return DB + "/" + path.replace(/^\/+/, "") + ".json" + (s ? "?" + s : "");
+}
+async function fbGet(path, query) {
+  const r = await fetch(await url(path, query));
+  if (r.status === 401) throw new Error("Firebase said 401 (permission denied): test mode has ended, or fill in the login in config.js");
+  if (r.status === 404) throw new Error("Firebase said 404: check firebaseUrl in config.js");
+  if (!r.ok) throw new Error("Firebase error " + r.status);
+  return r.json();
+}
+async function fbSend(method, path, value) {
+  const r = await fetch(await url(path), {method, headers: {"Content-Type": "application/json"},
+                                          body: value === undefined ? undefined : JSON.stringify(value)});
+  if (!r.ok) throw new Error("Firebase error " + r.status + " (could not save)");
+  return r.json().catch(() => null);
+}
+
+// ---------------- loading data ----------------
+async function loadBins() {
+  const keys = Object.keys(await fbGet("bins", {shallow: "true"}) || {});
+  const preds = await fbGet("predictions") || {};
+  S.preds = preds;
+  const jobs = keys.map(async id => {
+    if (!S.info[id]) S.info[id] = await fbGet("bins/" + id + "/info") || {};
+    const latest = await fbGet("bins/" + id + "/latest") || {};
+    S.bins[id] = latest;
+  });
+  await Promise.all(jobs);
+  for (const id of Object.keys(S.bins)) if (!keys.includes(id)) delete S.bins[id];
+  S.synthetic = Object.values(S.info).some(i => i && i.synthetic);
+}
+async function loadForecasts() {
+  const today = localDate(0);
+  const zones = Object.keys(await fbGet("forecasts", {shallow: "true"}) || {}).filter(z => z !== "_info");
+  S.forecasts = {};
+  await Promise.all(zones.map(async z => {
+    S.forecasts[z] = await fbGet("forecasts/" + z, {orderBy: '"$key"', startAt: '"' + today + '"', limitToFirst: "7"}) || {};
+  }));
+  S.fcInfo = await fbGet("forecasts/_info") || {};
+}
+async function loadRoutes() {
+  S.routes = await fbGet("routes/" + localDate(0)) || {};
+  S.trucks = await fbGet("trucks") || {};
+  S.traffic = await fbGet("traffic") || {};
+}
+async function loadRewards() {
+  S.rewards = await fbGet("rewards") || {};
+  S.guidance = await fbGet("guidance", {orderBy: '"$key"', startAt: '"' + localDate(0) + '"'}) || {};
+}
+
+// ---------------- BINS tab ----------------
+let binsMap = null, binsLayer = null, nearestLayer = null;
+function binRows() {
+  const rows = [];
+  const ids = new Set([...Object.keys(S.bins), ...Object.keys(S.preds)]);
+  for (const id of ids) {
+    const info = S.info[id] || {}, latest = S.bins[id] || {}, p = S.preds[id] || {};
+    const lat = info.lat ?? p.lat, lng = info.lng ?? p.lng;
+    rows.push({id, name: info.name || id, zone: info.zone || p.zone || "", lat, lng,
+               fill: latest.fill_pct ?? p.current_fill_pct, pred: p.predicted_fill_6h, risk: p.overflow_risk || "",
+               urgency: p.urgency_score, status: p.status || "", ts: latest.ts || p.based_on_ts,
+               synthetic: !!(info.synthetic || p.synthetic)});
+  }
+  rows.sort((a, b) => (b.urgency ?? -1) - (a.urgency ?? -1));
+  return rows;
+}
+function renderBins() {
+  const rows = binRows();
+  const riskPill = r => r === "high" ? '<span class="pill critical">▲ high</span>' :
+    r === "medium" ? '<span class="pill warning">● medium</span>' : r === "low" ? '<span class="pill good">low</span>' : "–";
+  $("binsTable").innerHTML = "<tr><th>Bin</th><th>Area</th><th>Fill now</th><th>In 6 h</th><th>Overflow risk</th>" +
+    "<th>Urgency</th><th>Data</th></tr>" + rows.map(r => {
+      const lv = fillLevel(r.fill);
+      return `<tr class="click${S.selected === r.id ? " sel" : ""}" data-id="${esc(r.id)}">
+        <td><b>${esc(r.id)}</b><br><span class="note">${esc(r.name)}${r.synthetic ? " (demo)" : ""}</span></td>
+        <td>${esc(r.zone)}</td>
+        <td><span class="bar"><span style="width:${Math.max(0, Math.min(100, r.fill ?? 0))}%;background:${lv.color}"></span></span>${r.fill == null ? "–" : Number(r.fill).toFixed(0) + "%"}</td>
+        <td>${r.pred == null ? "–" : Number(r.pred).toFixed(0) + "%"}</td>
+        <td>${riskPill(r.risk)}</td>
+        <td>${r.urgency == null ? "–" : r.urgency}</td>
+        <td class="note">${esc(r.status)}<br>${ago(r.ts)}</td></tr>`;
+    }).join("");
+  document.querySelectorAll("#binsTable tr.click").forEach(tr => tr.onclick = () => { S.selected = tr.dataset.id; renderBins(); showBinDetail(tr.dataset.id); });
+  if (!window.L) { $("binsMap").outerHTML = '<div class="nomap" id="binsMap">The map needs internet (Leaflet could not load).</div>'; return; }
+  if (!binsMap) {
+    binsMap = L.map("binsMap").setView(CFG.depot, 13);
+    addTiles(binsMap);
+    binsLayer = L.layerGroup().addTo(binsMap);
+    nearestLayer = L.layerGroup().addTo(binsMap);
+    binsMap.on("click", e => findNearest(e.latlng.lat, e.latlng.lng));
+  }
+  binsLayer.clearLayers();
+  const pts = [];
+  for (const r of rows) {
+    if (r.lat == null || r.lng == null) continue;
+    const lv = fillLevel(r.fill);
+    L.circleMarker([r.lat, r.lng], {radius: 8, color: "#0b0b0b", weight: 1.5, fillColor: lv.color, fillOpacity: 1})
+      .bindPopup(`<b>${esc(r.id)}</b> ${esc(r.name)}<br>Fill now: ${r.fill == null ? "no data" : Number(r.fill).toFixed(0) + "% (" + lv.label + ")"}<br>` +
+                 `In 6 hours: ${r.pred == null ? "–" : Number(r.pred).toFixed(0) + "%"}<br>Urgency: ${r.urgency ?? "–"}`)
+      .addTo(binsLayer);
+    pts.push([r.lat, r.lng]);
+  }
+  if (pts.length && !binsMap._fitted) { binsMap.fitBounds(pts, {padding: [30, 30]}); binsMap._fitted = true; }
+}
+function findNearest(lat, lng) {
+  const ok = binRows().filter(r => r.lat != null && r.fill != null && r.fill < 80 && (r.pred == null || r.pred < 90))
+    .map(r => Object.assign(r, {d: km(lat, lng, r.lat, r.lng)})).filter(r => r.d <= 2).sort((a, b) => a.d - b.d);
+  nearestLayer.clearLayers();
+  L.circleMarker([lat, lng], {radius: 6, color: "#2a78d6", fillColor: "#2a78d6", fillOpacity: 1}).addTo(nearestLayer);
+  if (!ok.length) { $("nearestMsg").textContent = "No bin with space within 2 km of that point."; return; }
+  const b = ok[0];
+  L.polyline([[lat, lng], [b.lat, b.lng]], {color: "#2a78d6", dashArray: "6 6"}).addTo(nearestLayer);
+  $("nearestMsg").innerHTML = `Nearest bin with space: <b>${esc(b.id)}</b> (${esc(b.name)}), ${(b.d * 1000).toFixed(0)} m away ` +
+    `(straight line), ${Number(b.fill).toFixed(0)}% full now.`;
+}
+async function showBinDetail(id) {
+  const box = $("binDetail");
+  box.innerHTML = '<p class="note">Loading the last 24 hours…</p>';
+  try {
+    const since = Date.now() - 24 * 3600000;
+    const data = await fbGet("bins/" + id + "/readings", {orderBy: '"$key"', startAt: '"' + since + '"'}) || {};
+    const pts = Object.values(data).filter(r => r && r.ts && r.fill_pct != null)
+      .map(r => [Number(r.ts), Number(r.fill_pct)]).sort((a, b) => a[0] - b[0]);
+    if (pts.length < 2) { box.innerHTML = `<p class="note"><b>${esc(id)}</b>: no readings in the last 24 hours` +
+      (S.info[id] && S.info[id].synthetic ? " (demo bins have no history)." : "."); return; }
+    box.innerHTML = `<h2>${esc(id)}: fill level, last 24 hours</h2>` + lineChart(pts, 560, 200);
+    wireTips(box);
+  } catch (e) { box.innerHTML = '<p class="note">' + esc(e.message) + "</p>"; }
+}
+function lineChart(pts, W, H) {
+  const m = {l: 36, r: 10, t: 10, b: 24};
+  const t0 = pts[0][0], t1 = pts[pts.length - 1][0];
+  const x = t => m.l + (t - t0) / Math.max(1, t1 - t0) * (W - m.l - m.r);
+  const y = v => m.t + (1 - v / 100) * (H - m.t - m.b);
+  let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Fill level over 24 hours">`;
+  for (const v of [0, 50, 80, 100]) svg += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}" stroke="#e1e0d9"/>` +
+    `<text x="${m.l - 6}" y="${y(v) + 4}" font-size="10" fill="#898781" text-anchor="end">${v}%</text>`;
+  svg += `<polyline fill="none" stroke="#2a78d6" stroke-width="2" points="${pts.map(p => x(p[0]).toFixed(1) + "," + y(p[1]).toFixed(1)).join(" ")}"/>`;
+  const step = Math.max(1, Math.floor(pts.length / 60));
+  pts.forEach((p, i) => { if (i % step === 0) svg += `<circle cx="${x(p[0])}" cy="${y(p[1])}" r="6" fill="transparent" data-tip="${hhmm(p[0])} – ${p[1].toFixed(0)}%"/>`; });
+  for (const t of [t0, (t0 + t1) / 2, t1]) svg += `<text x="${x(t)}" y="${H - 6}" font-size="10" fill="#898781" text-anchor="middle">${hhmm(t).slice(0, 5)}</text>`;
+  return svg + "</svg>";
+}
+function wireTips(root) {
+  root.querySelectorAll("[data-tip]").forEach(el => { el.onmousemove = e => showTip(e, esc(el.dataset.tip)); el.onmouseleave = hideTip; });
+}
+
+// ---------------- FORECAST tab ----------------
+function renderForecast() {
+  const zones = Object.keys(S.forecasts).sort();
+  const days = [...new Set(zones.flatMap(z => Object.keys(S.forecasts[z] || {})))].sort().slice(0, 7);
+  const info = S.fcInfo || {};
+  $("fcInfo").textContent = days.length ? `Tonnes per area per day. Model: ${info.model || "?"}, made ${ago(info.made_at)}` +
+    (info.synthetic ? " - from SYNTHETIC data." : ".") : "No forecasts yet - run  python f3_forecasts_to_firebase.py";
+  if (!days.length) { $("fcTable").innerHTML = ""; $("fcCharts").innerHTML = ""; return; }
+  const dayName = d => new Date(d + "T12:00:00").toLocaleDateString("en-GB", {weekday: "short", day: "numeric", month: "short"});
+  let html = "<tr><th>Area</th>" + days.map(d => `<th>${dayName(d)}</th>`).join("") + "</tr>";
+  for (const z of zones) {
+    html += `<tr><td><b>${esc(z)}</b></td>` + days.map(d => {
+      const f = (S.forecasts[z] || {})[d];
+      if (!f) return "<td>–</td>";
+      const flag = f.high_waste ? ' <span class="pill warning" title="One of the busiest days for this area">▲ busy</span>' : "";
+      return `<td>${Number(f.forecast_t).toFixed(1)} t${flag}<br><span class="note">${f.change_pct >= 0 ? "+" : ""}${Number(f.change_pct).toFixed(0)}% vs normal</span></td>`;
+    }).join("") + "</tr>";
+  }
+  const hol = days.map(d => { for (const z of zones) { const f = (S.forecasts[z] || {})[d]; if (f && f.holiday) return [d, f.holiday]; } return null; }).filter(Boolean);
+  if (hol.length) html += `<tr><td colspan="${days.length + 1}" class="note">Holidays: ${hol.map(h => dayName(h[0]) + " " + esc(h[1])).join("; ")}</td></tr>`;
+  $("fcTable").innerHTML = html;
+  $("fcCharts").innerHTML = zones.map(z => `<div class="card"><h2>${esc(z)}</h2><p class="sub">Forecast (bars) and a normal day (line), tonnes</p>` +
+    barChart(days.map(d => (S.forecasts[z] || {})[d]), days.map(dayName)) + "</div>").join("");
+  wireTips($("fcCharts"));
+}
+function barChart(items, labels) {
+  const W = 320, H = 180, m = {l: 30, r: 6, t: 18, b: 30};
+  const vals = items.map(f => f ? Number(f.forecast_t) : 0), norm = items.map(f => f ? Number(f.normal_t) : 0);
+  const top = Math.max(...vals, ...norm) * 1.15 || 1;
+  const bw = (W - m.l - m.r) / items.length;
+  const y = v => m.t + (1 - v / top) * (H - m.t - m.b);
+  let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Forecast bar chart">`;
+  svg += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(0)}" y2="${y(0)}" stroke="#c3c2b7"/>`;
+  items.forEach((f, i) => {
+    if (!f) return;
+    const x = m.l + i * bw + 3, h = y(0) - y(vals[i]);
+    const color = f.high_waste ? "#fab219" : "#2a78d6";
+    svg += `<rect x="${x}" y="${y(vals[i])}" width="${bw - 6}" height="${h}" rx="3" fill="${color}"
+             data-tip="${esc(labels[i])}: ${vals[i].toFixed(1)} t (normal ${norm[i].toFixed(1)} t)${f.high_waste ? " - busy day" : ""}${f.holiday ? " - " + esc(f.holiday) : ""}"/>`;
+    svg += `<line x1="${x}" x2="${x + bw - 6}" y1="${y(norm[i])}" y2="${y(norm[i])}" stroke="#0b0b0b" stroke-width="2"/>`;
+    svg += `<text x="${x + (bw - 6) / 2}" y="${y(vals[i]) - 4}" font-size="9.5" text-anchor="middle" fill="#0b0b0b">${vals[i].toFixed(1)}${f.high_waste ? "▲" : ""}</text>`;
+    svg += `<text x="${x + (bw - 6) / 2}" y="${H - 16}" font-size="9" text-anchor="middle" fill="#52514e">${esc(labels[i].split(" ")[0])}</text>`;
+    svg += `<text x="${x + (bw - 6) / 2}" y="${H - 5}" font-size="9" text-anchor="middle" fill="#898781">${esc(labels[i].split(" ")[1] || "")}</text>`;
+  });
+  return svg + "</svg>";
+}
+
+// ---------------- ROUTES tab ----------------
+let routesMap = null, routesLayer = null;
+function renderRoutes() {
+  const sum = S.routes._summary || {};
+  const trucks = Object.keys(S.routes).filter(k => k !== "_summary").sort();
+  $("routeInfo").textContent = sum.made_at ? `Plan made at ${hhmm(sum.made_at)} (${sum.trigger || ""}). Roads: ${sum.roads || "?"}. Solver: ${sum.solver || "?"}.`
+    : "No routes for today yet - start  python r3_live_routes.py";
+  $("routeSummary").innerHTML = sum.made_at ? `<p><b>${sum.planned}</b> bins planned, <b>${Number(sum.total_km || 0).toFixed(1)} km</b>, ` +
+    `diesel ${Number(sum.fuel_l || 0).toFixed(1)} L (Rs ${Number(sum.cost_lkr || 0).toLocaleString()}). ` +
+    `New routes were ready <b>${Number(sum.replan_seconds || 0).toFixed(2)} s</b> after the change was noticed.</p>` +
+    ((sum.skipped || []).length ? `<p class="note">Not collected: ${(sum.skipped || []).map(s => esc(s.bin_id) + " (" + esc(s.reason) + ")").join(", ")}</p>` : "") : "";
+  const allTrucks = [...new Set([...trucks, ...Object.keys(S.trucks || {})])].sort();
+  $("truckCards").innerHTML = allTrucks.map((t, i) => {
+    const r = S.routes[t] || {}, tr = S.trucks[t] || {};
+    const st = tr.status || "available";
+    const pill = st === "broken" ? '<span class="pill critical">✖ broken</span>' : st === "on_route" ? '<span class="pill good">● on the road</span>' : '<span class="pill muted">at the depot</span>';
+    const stops = (r.stops || []).map(s => `<li class="${s.done ? "done" : ""}">${esc(s.eta)} – <b>${esc(s.bin_id)}</b> ${esc(s.name || "")} (${Number(s.fill_pct).toFixed(0)}%)${s.done ? " ✓" : ""}</li>`).join("");
+    return `<div class="card" style="margin-top:10px;border-left:5px solid ${TRUCK_COLORS[i % 4]}">
+      <h2>${esc(r.truck || tr.name || t)} ${pill}</h2>
+      <p class="note">${r.stops && r.stops.length ? `${r.stops.length} stops, ${Number(r.km || 0).toFixed(1)} km, ${Number(r.minutes || 0).toFixed(0)} min, start ${esc(r.start || "")}, diesel ${Number(r.fuel_l || 0).toFixed(1)} L` : esc(r.note || "no stops in this plan")}</p>
+      <button class="act" data-truck="${esc(t)}" data-status="${st === "broken" ? "available" : "broken"}">${st === "broken" ? "Truck fixed" : "Truck broken"}</button>
+      ${stops ? `<ol class="stops">${stops}</ol>` : ""}</div>`;
+  }).join("") || '<p class="note">No trucks yet.</p>';
+  document.querySelectorAll("#truckCards button[data-truck]").forEach(b => b.onclick = () => setTruck(b.dataset.truck, b.dataset.status));
+  if (!window.L) { $("routesMap").outerHTML = '<div class="nomap" id="routesMap">The map needs internet (Leaflet could not load).</div>'; return; }
+  if (!routesMap) {
+    routesMap = L.map("routesMap").setView(CFG.depot, 13);
+    addTiles(routesMap);
+    routesLayer = L.layerGroup().addTo(routesMap);
+    routesMap.on("click", e => mapClick(e.latlng.lat, e.latlng.lng));
+  }
+  routesLayer.clearLayers();
+  const pts = [];
+  trucks.forEach((t, i) => {
+    const r = S.routes[t];
+    if (r.path && r.path.length > 1) { L.polyline(r.path, {color: TRUCK_COLORS[i % 4], weight: 5, opacity: 0.85}).addTo(routesLayer); pts.push(...r.path); }
+    (r.stops || []).forEach((s, k) => {
+      L.marker([s.lat, s.lng], {icon: L.divIcon({className: "", html: `<div class="numicon" style="background:${s.done ? "#898781" : TRUCK_COLORS[i % 4]}">${k + 1}</div>`, iconSize: [22, 22]})})
+        .bindPopup(`<b>${esc(s.bin_id)}</b> ${esc(s.name || "")}<br>Arrive ${esc(s.eta)}, ${Number(s.fill_pct).toFixed(0)}% full${s.done ? "<br>Emptied ✓" : ""}`).addTo(routesLayer);
+      pts.push([s.lat, s.lng]);
+    });
+  });
+  for (const [t, tr] of Object.entries(S.trucks || {})) {
+    if (tr && tr.lat != null) L.marker([tr.lat, tr.lng], {icon: L.divIcon({className: "", html: `<div class="truckicon">${esc(tr.name || t)}</div>`, iconSize: [60, 18]})})
+      .bindPopup(`${esc(tr.name || t)}: ${esc(tr.status || "")}, GPS ${ago(tr.ts)}`).addTo(routesLayer);
+  }
+  for (const [id, z] of Object.entries(S.traffic || {})) {
+    if (!z || z.lat == null) continue;
+    if (z.until && Number(z.until) < Date.now()) continue;
+    L.circle([z.lat, z.lng], {radius: z.radius_m || 300, color: "#d03b3b", weight: 2, fillOpacity: z.kind === "jam" ? 0.08 : 0.2})
+      .bindPopup(`${z.kind === "jam" ? "Traffic jam" : "Road closed"}: ${esc(z.note || "")}`).addTo(routesLayer);
+  }
+  L.marker(CFG.depot, {icon: L.divIcon({className: "", html: '<div class="truckicon" style="background:#0b0b0b">Depot</div>', iconSize: [44, 18]})}).addTo(routesLayer);
+  if (pts.length && !routesMap._fitted) { routesMap.fitBounds(pts, {padding: [30, 30]}); routesMap._fitted = true; }
+}
+function setMode(m) {
+  S.mode = S.mode === m ? null : m;
+  $("btnClose").classList.toggle("on", S.mode === "closure");
+  $("btnJam").classList.toggle("on", S.mode === "jam");
+  $("routeMsg").textContent = S.mode ? "Now click the road on the map." : "";
+}
+async function mapClick(lat, lng) {
+  if (!S.mode) return;
+  const kind = S.mode;
+  setMode(kind);
+  try {
+    await fbSend("POST", "traffic", {kind, lat: Number(lat.toFixed(6)), lng: Number(lng.toFixed(6)), radius_m: 300,
+      note: kind === "jam" ? "traffic jam (dashboard)" : "road closed (dashboard)", created_at: {".sv": "timestamp"},
+      until: Date.now() + 3 * 3600000});
+    $("routeMsg").textContent = (kind === "jam" ? "Traffic jam" : "Road closure") + " saved. Waiting for the planner to make new routes…";
+    refreshSoon();
+  } catch (e) { $("routeMsg").textContent = e.message; }
+}
+async function setTruck(t, status) {
+  try { await fbSend("PATCH", "trucks/" + t, {status}); $("routeMsg").textContent = `${t} is now "${status}". Waiting for new routes…`; refreshSoon(); }
+  catch (e) { $("routeMsg").textContent = e.message; }
+}
+
+// ---------------- REWARDS tab ----------------
+function renderRewards() {
+  const users = Object.entries(S.rewards || {}).filter(([u, v]) => u !== "_processed" && v && typeof v === "object");
+  users.sort((a, b) => (b[1].points || 0) - (a[1].points || 0));
+  $("board").innerHTML = "<tr><th>#</th><th>Citizen</th><th>Points</th></tr>" +
+    (users.map(([u, v], i) => `<tr><td>${i + 1}</td><td>${esc(u)}</td><td><b>${v.points || 0}</b></td></tr>`).join("") ||
+     '<tr><td colspan="3" class="note">No points yet - run  python e1_rewards.py</td></tr>');
+  const hist = users.flatMap(([u, v]) => Object.values(v.history || {}).map(h => Object.assign({user: u}, h)))
+    .sort((a, b) => (b.ts || 0) - (a.ts || 0)).slice(0, 10);
+  $("history").innerHTML = "<tr><th>When</th><th>Citizen</th><th>What</th><th>Points</th></tr>" +
+    hist.map(h => `<tr><td class="note">${ago(h.ts)}</td><td>${esc(h.user)}</td><td>${esc(h.note || h.action)}</td><td>${h.points}</td></tr>`).join("");
+  const days = Object.keys(S.guidance || {}).filter(d => d !== "_info").sort().slice(0, 7);
+  $("tips").innerHTML = days.map(d => {
+    const zones = S.guidance[d] || {};
+    const items = Object.entries(zones).flatMap(([z, tips]) => (Array.isArray(tips) ? tips : Object.values(tips || {})).map(t => `<div class="tip"><b>${esc(z)}</b>: ${esc(t)}</div>`));
+    return items.length ? `<h2 style="margin-top:12px">${new Date(d + "T12:00:00").toLocaleDateString("en-GB", {weekday: "long", day: "numeric", month: "long"})}</h2>` + items.join("") : "";
+  }).join("") || '<p class="note">No special tips for the next days (or run  python e2_crew_tips.py).</p>';
+}
+
+// ---------------- general ----------------
+function addTiles(map) {
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    {maxZoom: 19, attribution: "&copy; OpenStreetMap contributors"}).addTo(map);  // free, no API key
+}
+let current = "bins";
+async function refresh() {
+  if (!DB || DB.includes("YOUR-PROJECT")) {
+    $("status").textContent = "Open config.js and set firebaseUrl to your database URL.";
+    $("status").className = "bad";
+    return;
+  }
+  try {
+    if (current === "bins") { await loadBins(); renderBins(); }
+    if (current === "forecast") { await loadForecasts(); renderForecast(); }
+    if (current === "routes") { await Promise.all([loadRoutes(), Object.keys(S.info).length ? null : loadBins()]); renderRoutes(); }
+    if (current === "rewards") { await loadRewards(); renderRewards(); }
+    $("status").textContent = "Connected to " + DB.replace(/^https?:\/\//, "") + " – updated " + hhmm(Date.now());
+    $("status").className = "";
+    $("synthetic").style.display = S.synthetic ? "inline-block" : "none";
+  } catch (e) {
+    $("status").textContent = e.message || String(e);
+    $("status").className = "bad";
+  }
+}
+let soon = null;
+function refreshSoon() { clearTimeout(soon); soon = setTimeout(refresh, 1500); }
+document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
+  document.querySelectorAll("nav button").forEach(x => x.classList.toggle("on", x === b));
+  document.querySelectorAll("section").forEach(s => s.classList.toggle("on", s.id === b.dataset.tab));
+  current = b.dataset.tab;
+  refresh().then(() => { [binsMap, routesMap].forEach(m => m && m.invalidateSize()); });
+});
+$("btnClose").onclick = () => setMode("closure");
+$("btnJam").onclick = () => setMode("jam");
+$("btnClear").onclick = async () => { try { await fbSend("DELETE", "traffic"); $("routeMsg").textContent = "All roads are open again. Waiting for new routes…"; refreshSoon(); } catch (e) { $("routeMsg").textContent = e.message; } };
+$("btnReplan").onclick = async () => { try { await fbSend("PUT", "control/replan", {".sv": "timestamp"}); $("routeMsg").textContent = "Re-plan asked. Waiting for the planner…"; refreshSoon(); } catch (e) { $("routeMsg").textContent = e.message; } };
+refresh();
+setInterval(refresh, (CFG.refreshSeconds || 15) * 1000);
+</script>
+</body>
+</html>

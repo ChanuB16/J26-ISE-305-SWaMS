@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% from "_macros.html" import icon %}
+{% block content %}
+<div class="grid g-main">
+  <form class="card" id="form" novalidate>
+    <h2>Scan rubbish</h2>
+    <p class="sub">Take or choose a photo of ONE item. The AI tells you which bin it goes in
+      (plastic / paper / glass / metal / organic) and gives short disposal tips.</p>
+
+    <div class="field mt">
+      <label class="f">Photo</label>
+      <label class="photo-drop" id="drop">
+        <input type="file" id="photo" accept="image/*" capture="environment" class="sr">
+        <span id="photoText">{{ icon("camera") }}<br>Tap to take or choose a photo</span>
+      </label>
+    </div>
+
+    <div class="field">
+      <label class="f" for="lang">Language</label>
+      <select id="lang">
+        <option value="en">English</option>
+        <option value="si">සිංහල</option>
+        <option value="ta">தமிழ்</option>
+      </select>
+    </div>
+
+    <button class="btn big block" type="submit" id="send" disabled>Classify</button>
+    <div class="msg" id="msg" role="status"></div>
+    <p class="small muted mt">+10 points when the AI is 70%+ sure (checked every 10 minutes by the rewards job).</p>
+  </form>
+
+  <div class="card">
+    <div class="card-head"><h2>Result</h2></div>
+    <div id="result">
+      <div class="empty"><b>No photo yet</b>Pick a photo on the left to see the result here.</div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}<script type="module" src="/static/js/pages/citizen_scan.js?v={{ version }}"></script>{% endblock %}

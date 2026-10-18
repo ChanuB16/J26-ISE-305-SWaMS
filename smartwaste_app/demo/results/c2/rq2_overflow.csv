@@ -1,0 +1,4 @@
+Method,Precision,Recall,F1,Alerts
+B0 threshold (current fill >= 75%),70.0,78.7,74.1,1141
+Trend (predicted >= 90%),57.4,77.6,66.0,1374
+Neural Network (MLP) (predicted >= 90%),89.7,79.6,84.3,901

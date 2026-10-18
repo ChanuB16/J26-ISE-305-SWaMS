@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% from "_macros.html" import icon %}
+{% block content %}
+<div id="err"></div>
+<div class="grid g-main">
+  <div class="card">
+    <div class="card-head"><h2>Is everything working?</h2><span id="healthSum"></span></div>
+    <p class="sub">Checked every few seconds. Use the buttons to fix what is red.</p>
+    <div id="health"></div>
+  </div>
+  <div class="stack">
+    <div class="card">
+      <h2>Automatic mode</h2>
+      <p class="sub">With this on, you only switch on the bin and start <code>python app.py</code>. Everything else runs by itself while the app is running.</p>
+      <div class="stack" style="gap:10px" id="auto">
+        <label class="row" style="align-items:flex-start;gap:8px"><input type="checkbox" id="a_autostart" style="margin-top:3px"><span><b>Live predictions and route planner</b><br><span class="small muted">start when the app starts, and start again if they stop</span></span></label>
+        <label class="row" style="align-items:flex-start;gap:8px"><input type="checkbox" id="a_forecast" style="margin-top:3px"><span><b>7-day forecast and crew tips every day</b> at <input type="text" id="a_time" style="width:70px;min-height:28px;padding:2px 6px" maxlength="5"><br><span class="small muted">and right away if today has no forecast yet</span></span></label>
+        <label class="row" style="align-items:flex-start;gap:8px"><span><b>Reward points</b> every <input type="number" id="a_rewards" min="0" max="1440" style="width:70px;min-height:28px;padding:2px 6px"> minutes<br><span class="small muted">0 = off</span></span></label>
+      </div>
+      <div class="msg" id="amsg"></div>
+    </div>
+    <div class="card">
+      <h2>Database</h2>
+      <div class="scroll"><table class="tbl"><tbody>
+        <tr><td>Data</td><td>{% if demo %}<span class="pill rk-medium">DEMO DATA</span> in memory (demo/demo_db.json){% else %}<span class="pill lv-normal">✓ Firebase</span> <code>{{ db_url }}</code>{% endif %}</td></tr>
+        {% if not demo %}<tr><td>URL from</td><td><code>{{ db_from }}</code></td></tr>{% endif %}
+        <tr><td>ML folders</td><td class="small"><code>{{ results_info.c2.folder }}</code><br><code>{{ results_info.c3.folder }}</code></td></tr>
+      </tbody></table></div>
+      {% if demo %}<p class="small muted mt">To use your Firebase: put the URL in <code>settings.py</code> (or <code>../smart_bin_ml/settings.py</code>) and restart the app. The jobs then use the same database.</p>{% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="card mt">
+  <div class="card-head">
+    <h2>First-time setup (only once)</h2>
+    <div class="row" id="setupBtns">
+      <button class="btn" data-pipe="all">Run all setup steps</button>
+      <button class="btn ghost small" data-pipe="c2">Only Component 2</button>
+      <button class="btn ghost small" data-pipe="c3">Only Component 3</button>
+    </div>
+  </div>
+  <p class="sub">Makes the training data, trains the models and runs the tests – the same as running the scripts b2, b3, b4, f1, f2, r1, r2 by hand. Takes about 10–15 minutes. The results appear under Analytics. Run it again after you change data or settings.</p>
+  <div id="pipe"></div>
+  <div class="grid g2" id="setup"></div>
+</div>
+
+<div class="card mt">
+  <div class="card-head"><h2>Live jobs</h2><span class="muted small">{% if demo %}Demo mode: the jobs read and write the demo data.{% else %}The jobs use the same database as this app.{% endif %}</span></div>
+  <div class="grid g2" id="jobs"></div>
+</div>
+
+<div class="card mt">
+  <div class="card-head"><h2>Users and access</h2><span class="muted small">Officers see everything. Drivers see only their route. Citizens need no account.</span></div>
+  <div class="scroll" id="users"></div>
+  <h3 class="mt" style="margin-bottom:8px">Add a staff account</h3>
+  <form id="addUser" class="grid g4" autocomplete="off">
+    <div><label class="f" for="nu">User name</label><input type="text" id="nu" required pattern="[a-z0-9_.\-]{3,30}" autocapitalize="none" placeholder="e.g. driver1"></div>
+    <div><label class="f" for="nn">Name</label><input type="text" id="nn" maxlength="60" placeholder="e.g. Nimal Perera"></div>
+    <div><label class="f" for="nr">Role</label><select id="nr"><option value="driver">Truck driver</option><option value="officer">Municipal officer</option></select></div>
+    <div><label class="f" for="nt">Truck (drivers)</label><select id="nt"><option value="">– any –</option></select></div>
+    <div><label class="f" for="np">Password (8+ characters)</label><input type="password" id="np" minlength="8" required autocomplete="new-password"></div>
+    <div style="align-self:end"><button class="btn" type="submit">Add account</button></div>
+  </form>
+  <div class="msg" id="umsg"></div>
+</div>
+{% endblock %}
+{% block scripts %}<script type="module" src="/static/js/pages/officer_system.js?v={{ version }}"></script>{% endblock %}

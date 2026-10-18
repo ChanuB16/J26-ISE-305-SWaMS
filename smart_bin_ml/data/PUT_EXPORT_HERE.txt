@@ -1,0 +1,2 @@
+Optional: put your Firebase export here as smart-bin-export.json before running b2_make_data.py.
+The scripts write their data files into this folder.

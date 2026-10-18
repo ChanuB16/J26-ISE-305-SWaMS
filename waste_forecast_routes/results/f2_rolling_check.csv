@@ -1,0 +1,5 @@
+Test period,Moving average (7 days),Same day last week,Linear Regression,Gradient Boosting (XGBoost not installed)
+03 Feb 2026 - 03 Apr 2026,0.614,0.6518,0.4403,0.4378
+04 Apr 2026 - 02 Jun 2026,0.711,0.8874,0.4804,0.5781
+03 Jun 2026 - 01 Aug 2026,0.5047,0.5688,0.4169,0.4068
+02 Aug 2026 - 30 Sep 2026,0.51,0.5624,0.3996,0.4073

@@ -1,0 +1,41 @@
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+.idea/
+*.iml
+*.ipr
+*.iws
+local.properties
+
+# Android
+android/.gradle/
+android/captures/
+android/gradlew
+android/gradlew.bat
+android/gradle/
+android/local.properties
+android/key.properties
+android/app/debug/
+android/app/profile/
+android/app/release/
+
+# iOS (not used, but included for safety)
+ios/
+macos/
+linux/
+windows/
+web/
+
+# IDE
+.vscode/
+.idea/
+
+# Secrets
+google-services.json
+*.jks
+*.keystore

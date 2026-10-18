@@ -1,0 +1,22 @@
+bin_id,name,zone,type,lat,lng,synthetic
+sim_01,Malabe market,Malabe,market,6.901313,79.972167,True
+sim_02,Malabe bus stop,Malabe,bus_stop,6.929445,79.968419,True
+sim_03,Malabe residential,Malabe,residential,6.899752,79.966201,True
+sim_04,Malabe school,Malabe,school,6.907281,79.971186,True
+sim_05,Malabe office,Malabe,office,6.901503,79.976642,True
+sim_06,Kaduwela market,Kaduwela,market,6.935283,79.98153,True
+sim_07,Kaduwela bus stop,Kaduwela,bus_stop,6.925805,79.993912,True
+sim_08,Kaduwela residential,Kaduwela,residential,6.943121,79.992032,True
+sim_09,Kaduwela temple,Kaduwela,temple,6.93057,79.985213,True
+sim_10,Battaramulla office,Battaramulla,office,6.908393,79.918274,True
+sim_11,Battaramulla residential,Battaramulla,residential,6.885797,79.910531,True
+sim_12,Battaramulla market,Battaramulla,market,6.900904,79.920655,True
+sim_13,Battaramulla school,Battaramulla,school,6.897751,79.909387,True
+sim_14,Athurugiriya residential,Athurugiriya,residential,6.872429,80.000908,True
+sim_15,Athurugiriya bus stop,Athurugiriya,bus_stop,6.87765,80.004266,True
+sim_16,Athurugiriya temple,Athurugiriya,temple,6.871525,79.98988,True
+sim_17,Thalangama residential,Thalangama,residential,6.910518,79.925767,True
+sim_18,Thalangama school,Thalangama,school,6.913552,79.927057,True
+sim_19,Hokandara residential,Hokandara,residential,6.88752,79.968898,True
+sim_20,Hokandara market,Hokandara,market,6.887961,79.968868,True
+bin_01,Real smart bin (Part A),Malabe,school,6.9147,79.9729,False

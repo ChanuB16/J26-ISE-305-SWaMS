@@ -1,0 +1,9 @@
+flask>=3.0
+requests>=2.28
+
+# Component 1 (waste classifier) – delete these 4 lines (and set
+# CLASSIFIER_MODEL = "" in settings.py) to switch off the Scan tab.
+tensorflow>=2.17
+keras>=3.12
+numpy<2.1
+pillow>=10.0

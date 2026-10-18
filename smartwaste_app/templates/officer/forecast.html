@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% from "_macros.html" import icon %}
+{% block content %}
+<div id="err"></div>
+<div class="row between mb">
+  <div class="muted small" id="info">Loading…</div>
+  <div class="row"><div class="seg" id="mode"><button data-v="daily" class="on">Daily</button><button data-v="weekly">Weekly</button></div>
+  <a class="btn ghost small" href="/api/export/forecast.csv">{{ icon("download") }} CSV</a></div>
+</div>
+<div class="grid g4" id="kpis"></div>
+<div class="grid g-main mt">
+  <div class="card">
+    <div class="card-head"><h2 id="mainTitle">All areas: tonnes per day</h2></div>
+    <p class="sub" id="mainSub">Bars = forecast · black line = a normal day for that weekday · ▲ orange = busy day (top 10% for the area)</p>
+    <div id="chMain"></div>
+  </div>
+  <div class="card">
+    <h2>Why some days are busy</h2>
+    <div id="why"></div>
+    <h2 class="mt" style="margin-bottom:8px">Tips for the crews</h2>
+    <div id="tips"></div>
+  </div>
+</div>
+<div class="card mt">
+  <h2>Forecast by area</h2>
+  <p class="sub">Tonnes per day. Change = compared with a normal day for that weekday.</p>
+  <div class="scroll" id="table"></div>
+</div>
+<h2 class="mt mb" style="margin-top:18px">Each area</h2>
+<div class="grid g3" id="areas"></div>
+{% endblock %}
+{% block scripts %}<script type="module" src="/static/js/pages/officer_forecast.js?v={{ version }}"></script>{% endblock %}

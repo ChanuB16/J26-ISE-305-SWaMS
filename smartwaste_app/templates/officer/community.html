@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% from "_macros.html" import icon %}
+{% block content %}
+<div id="err"></div>
+<div class="grid g4 mb" id="kpis"></div>
+<div class="grid g-main">
+  <div class="card">
+    <div class="card-head"><h2>Citizen reports</h2>
+      <div class="row"><div class="seg" id="st"><button data-v="open" class="on">Open</button><button data-v="new">New</button><button data-v="in_progress">In progress</button><button data-v="resolved">Resolved</button><button data-v="all">All</button></div>
+      <a class="btn ghost small" href="/api/export/reports.csv">{{ icon("download") }} CSV</a></div></div>
+    <p class="sub">Full-bin reports get points only when the bin's own sensor confirms it (80%+), so fake reports earn nothing.</p>
+    <div class="scroll" id="reports"></div>
+  </div>
+  <div class="stack">
+    <div class="card"><div class="card-head"><h2>Green points leaderboard</h2><a class="small" href="/api/export/rewards.csv">CSV</a></div><div id="board"></div></div>
+    <div class="card"><h2>Waste photos (Component 1)</h2><p class="sub">Photos classified by the waste scanner app. 10 points when the AI is 70%+ sure.</p><div id="photos"></div></div>
+  </div>
+</div>
+<div class="grid g2 mt">
+  <div class="card"><h2>Latest points given</h2><div class="scroll" id="history"></div></div>
+  <div class="card"><h2>Tips for the crews (next busy days)</h2><div id="tips"></div></div>
+</div>
+{% endblock %}
+{% block scripts %}<script type="module" src="/static/js/pages/officer_community.js?v={{ version }}"></script>{% endblock %}

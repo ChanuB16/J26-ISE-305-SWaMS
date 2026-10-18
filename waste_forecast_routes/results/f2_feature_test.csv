@@ -1,0 +1,5 @@
+Inputs,MAE all days (t),MAE holidays and festivals (t),MAE normal days (t),Number of inputs
+A  past waste + day of week,0.5018,0.7256,0.4546,18
+"B  + holidays, festivals, events",0.4765,0.6392,0.4422,35
+C  + weather,0.466,0.6406,0.4292,38
+"D  + area facts (people, shops)",0.4575,0.6112,0.4251,40

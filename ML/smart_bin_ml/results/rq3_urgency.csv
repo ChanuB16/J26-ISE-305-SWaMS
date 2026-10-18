@@ -1,0 +1,4 @@
+Ranking,"Top-5 recall, needs early collection (%)","Top-5 recall, overflow only (%)"
+U0 current fill only,90.8,92.2
+U1 predicted fill only,93.4,95.1
+U2 urgency score (proposal),90.8,91.7

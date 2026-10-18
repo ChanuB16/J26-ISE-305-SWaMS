@@ -1,0 +1,6 @@
+Method,km,hours,fuel_l,bins_emptied,trucks_per_day,avg_fill_collected,overflow_bin_days,overflow_litres,full_bin_hours,service_level,solve_max_s,solve_mean_s,overtime_h,days,fuel_cost_lkr,overflows_festival_days,overflows_other_days
+Fixed schedule,1966.473,110.691,983.237,410,2.0,56.613,18,209.162,37,97.143,0.0,0.0,0.0,30,385428.708,13,5
+Reactive (70% now),1126.689,64.206,563.344,234,1.0,90.802,117,3192.476,408,81.429,0.016,0.002,0.0,30,220830.946,60,57
+Predictive (bin speed only),1293.309,82.245,646.655,337,1.0,68.424,17,174.794,29,97.302,0.042,0.008,0.0,30,253488.603,10,7
+Predictive + forecast,1304.129,82.46,652.064,339,1.0,67.927,11,125.541,20,98.254,0.036,0.009,0.0,30,255609.264,2,9
+"Predictive + forecast, nearest-bin route",1446.809,92.585,723.404,344,1.0,66.749,20,227.387,39,96.825,0.023,0.008,0.209,30,283574.564,6,14

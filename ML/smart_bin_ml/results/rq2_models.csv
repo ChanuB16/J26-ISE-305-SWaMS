@@ -1,0 +1,7 @@
+Model,Type,MAE,RMSE,R2,Validation MAE
+Persistence (fill stays the same),baseline,9.352,13.879,0.7,8.969
+Trend (last 3 h fill speed),baseline,9.916,13.859,0.701,9.987
+Linear Regression,ML,6.24,9.055,0.872,6.158
+Random Forest,ML,5.211,7.7,0.908,5.069
+Gradient Boosting,ML,5.174,7.625,0.909,4.974
+Neural Network (MLP),ML,5.119,7.646,0.909,4.877

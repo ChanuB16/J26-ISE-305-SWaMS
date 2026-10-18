@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% from "_macros.html" import icon %}
+{% block content %}
+<div class="grid g-main">
+  <form class="card" id="form" novalidate>
+    <h2>What is the problem?</h2>
+    <div class="choice mt" id="types">
+      <label><input type="radio" name="type" value="overflowing_bin" checked>{{ icon("bin") }}Overflowing bin</label>
+      <label><input type="radio" name="type" value="illegal_dumping">{{ icon("alert") }}Illegal dumping</label>
+      <label><input type="radio" name="type" value="damaged_bin">{{ icon("tool") }}Damaged bin</label>
+      <label><input type="radio" name="type" value="other">{{ icon("chat") }}Other</label>
+    </div>
+    <div class="field mt">
+      <label class="f" for="bin">Which bin? <span class="muted" id="binHint">(needed for an overflowing bin)</span></label>
+      <select id="bin"><option value="">– not at a bin –</option></select>
+      <button type="button" class="btn ghost small mt" id="locBtn">{{ icon("pin") }} Use my location (sorts the bins, adds the place)</button>
+      <div class="small muted" id="locText"></div>
+    </div>
+    <div class="field">
+      <label class="f">Photo (optional)</label>
+      <label class="photo-drop" id="drop"><input type="file" id="photo" accept="image/*" capture="environment" class="sr"><span id="photoText">{{ icon("camera") }}<br>Tap to take or choose a photo</span></label>
+    </div>
+    <div class="field">
+      <label class="f" for="note">Anything else? (optional)</label>
+      <textarea id="note" maxlength="500" placeholder="e.g. bags are on the road next to the bin"></textarea>
+    </div>
+    <button class="btn big block" type="submit" id="send">Send report</button>
+    <div class="msg" id="msg" role="status"></div>
+    <p class="small muted mt">Full-bin reports earn 5 points when the bin's own sensor confirms it is 80%+ full.</p>
+  </form>
+  <div class="card">
+    <div class="card-head"><h2>My reports</h2></div>
+    <div id="mine"></div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}<script type="module" src="/static/js/pages/citizen_report.js?v={{ version }}"></script>{% endblock %}

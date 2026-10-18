@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% from "_macros.html" import icon %}
+{% block content %}
+<div class="card hero mb no-print">
+  <div class="row between">
+    <div><h2 style="font-size:18px">Report centre</h2><p class="muted" style="margin:4px 0 0">Download the data as CSV (opens in Excel), or print the summary below as a PDF.</p></div>
+    <button class="btn" style="background:#fff;color:#154d2b;border-color:#fff" onclick="window.print()">{{ icon("print") }} Print / save as PDF</button>
+  </div>
+</div>
+<div class="grid g3 no-print">
+  <div class="card"><h2>{{ icon("bin") }} Bins now</h2><p class="sub">Every bin: level, fill, prediction, urgency, sensors.</p><a class="btn ghost small" href="/api/export/bins.csv">{{ icon("download") }} bins.csv</a></div>
+  <div class="card"><h2>{{ icon("alert") }} Early warnings</h2><p class="sub">The warnings shown on the operations page right now.</p><a class="btn ghost small" href="/api/export/alerts.csv">{{ icon("download") }} alerts.csv</a></div>
+  <div class="card"><h2>{{ icon("check") }} Emptying history</h2><p class="sub">When each bin was emptied and how full it was.</p><a class="btn ghost small" href="/api/export/collections.csv">{{ icon("download") }} collections.csv</a></div>
+  <div class="card"><h2>{{ icon("chart") }} 7-day forecast</h2><p class="sub">Tonnes per area per day, busy days, holidays.</p><a class="btn ghost small" href="/api/export/forecast.csv">{{ icon("download") }} forecast.csv</a></div>
+  <div class="card"><h2>{{ icon("route") }} Truck routes</h2><p class="sub">Stops, times and fill levels for one day.</p><div class="row"><input type="date" id="rday" style="width:auto"><a class="btn ghost small" id="rlink" href="/api/export/routes.csv">{{ icon("download") }} routes.csv</a></div></div>
+  <div class="card"><h2>{{ icon("people") }} Citizens</h2><p class="sub">Citizen reports and reward points.</p><div class="row"><a class="btn ghost small" href="/api/export/reports.csv">{{ icon("download") }} reports.csv</a><a class="btn ghost small" href="/api/export/rewards.csv">{{ icon("download") }} rewards.csv</a></div></div>
+  <div class="card span2"><h2>{{ icon("clock") }} All readings of one bin</h2><p class="sub">Every sensor reading (fill, weight, gas, temperature, humidity, battery) for the chosen time.</p>
+    <div class="row"><select id="bin" style="width:auto"></select><select id="range" style="width:auto"><option value="24h">last 24 hours</option><option value="3d">last 3 days</option><option value="7d">last 7 days</option></select>
+    <a class="btn ghost small" id="blink" href="#">{{ icon("download") }} readings.csv</a></div></div>
+  <div class="card"><h2>{{ icon("star") }} Usability (SUS)</h2><p class="sub">All questionnaire answers with scores.</p><a class="btn ghost small" href="/api/export/sus.csv">{{ icon("download") }} sus.csv</a></div>
+</div>
+
+<div class="print-only" style="margin-bottom:12px">
+  <h1>SmartWaste LK – operations summary</h1>
+  <p>Kaduwela Municipal Council · printed <span id="printed"></span>{% if demo %} · DEMO DATA{% endif %}</p>
+</div>
+<h2 class="mt mb no-print" style="margin-top:20px">Summary (this is what prints)</h2>
+<div id="err"></div>
+<div class="grid g4" id="kpis"></div>
+<div class="grid g2 mt">
+  <div class="card"><h2>Bins that need attention</h2><div class="scroll" id="urgent"></div></div>
+  <div class="card"><h2>Early warnings</h2><div id="alerts"></div></div>
+  <div class="card"><h2>Waste forecast (tonnes, all areas)</h2><div class="scroll" id="fc"></div></div>
+  <div class="card"><h2>Today's routes</h2><div class="scroll" id="routes"></div></div>
+</div>
+{% endblock %}
+{% block scripts %}<script type="module" src="/static/js/pages/officer_reports.js?v={{ version }}"></script>{% endblock %}

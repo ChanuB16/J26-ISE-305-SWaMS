@@ -1,0 +1,6 @@
+model,accuracy,precision,recall,f1
+Baseline CNN,0.779,0.751,0.749,0.747
+MobileNetV2,0.927,0.909,0.928,0.918
+EfficientNetB0,0.938,0.933,0.934,0.933
+MobileNetV2 - public only,0.93,0.913,0.932,0.922
+MobileNetV2 - public + Sri Lankan,0.927,0.909,0.928,0.918

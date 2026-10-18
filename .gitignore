@@ -1,0 +1,62 @@
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editors
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# Secrets
+.env
+.env.*
+*.pem
+*.jks
+*.keystore
+google-services.json
+**/key.properties
+**/local.properties
+smartwaste_app/instance/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+**/ephemeral/
+smartwaste_mobile/build/
+
+# Android / Gradle
+**/.gradle/
+**/captures/
+*.apk
+*.aab
+
+# Arduino
+build/
+
+# Trained models and datasets (too large for git)
+*.keras
+*.h5
+*.tflite
+*.pkl
+*.joblib
+*.pt
+*.pth
+waste_classifier/data/raw/
+waste_classifier/data/trashnet.zip

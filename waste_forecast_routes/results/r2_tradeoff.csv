@@ -1,0 +1,10 @@
+Method,km,overflow bin-days,threshold
+Reactive (fill now),1283.3179,27.0,50%
+Reactive (fill now),1176.104,65.0,60%
+Reactive (fill now),1126.6885000000002,117.0,70%
+Reactive (fill now),1093.2395000000001,139.0,80%
+Predictive + forecast,1383.7012000000002,10.0,80%
+Predictive + forecast,1304.1289000000002,11.0,90%
+Predictive + forecast,1201.6681000000003,39.0,100%
+Predictive + forecast,1147.5803,88.0,110%
+Fixed schedule,1966.4730000000006,18.0,

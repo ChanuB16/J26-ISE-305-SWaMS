@@ -1,0 +1,60 @@
+name: smartwaste
+description: SmartWaste LK mobile app (Kaduwela Municipal Council) - citizen, driver, officer.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+  flutter: '>=3.19.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+
+  # HTTP + Firebase Realtime Database REST (no FlutterFire needed)
+  http: ^1.2.0
+
+  # Password hash verification (werkzeug-compatible: pbkdf2:sha256 + scrypt)
+  pointycastle: ^3.9.1
+  crypto: ^3.0.3
+
+  # Location + offline-tile map
+  geolocator: ^12.0.0
+  flutter_map: ^7.0.0
+  latlong2: ^0.9.1
+
+  # Camera / photos / image handling
+  image_picker: ^1.1.0
+  image: ^4.1.7
+
+  # Permission handling (location, camera, storage)
+  permission_handler: ^11.3.0
+
+  # Simple state management
+  provider: ^6.1.2
+
+  # On-device TensorFlow Lite classifier
+  tflite_flutter: ^0.11.0
+
+  # URL launching (Google Maps navigate)
+  url_launcher: ^6.3.0
+
+  # Charts for officer analytics (Stage 3)
+  fl_chart: ^0.68.0
+
+  # CSV export (officer reports, Stage 3)
+  csv: ^6.0.0
+  path_provider: ^2.1.3
+  share_plus: ^9.0.0
+
+  # Date formatting
+  intl: ^0.19.0
+
+dev_dependencies:
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/

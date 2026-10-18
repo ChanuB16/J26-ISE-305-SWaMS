@@ -1,0 +1,64 @@
+{% from "_macros.html" import icon %}<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ title }} · SmartWaste LK</title>
+<link rel="icon" href="/static/img/logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/static/css/app.css?v={{ version }}">
+<meta name="csrf" content="{{ csrf }}">
+<script>window.SW = {{ cfg|tojson }};</script>
+{% block head %}{% endblock %}
+</head>
+<body class="role-{{ user.role if user else 'none' }}">
+{% include "_icons.html" %}
+{% if user %}
+<aside class="side" id="side">
+  <div class="brand">
+    <div class="logo">{{ icon("leaf") }}</div>
+    <div><b>SmartWaste LK</b><span>Kaduwela Municipal Council</span></div>
+  </div>
+  <nav aria-label="Main">
+    {% for label, href, ic in nav %}
+    <a href="{{ href }}" class="{{ 'on' if active == href }}">{{ icon(ic) }}<span>{{ label }}</span></a>
+    {% endfor %}
+  </nav>
+  <div class="me">
+    <b>{{ user.name }}</b>
+    {{ {"officer": "Municipal officer", "driver": "Truck driver", "citizen": "Citizen"}[user.role] }}{% if user.truck %} · {{ user.truck }}{% endif %}
+    <form method="post" action="/logout"><input type="hidden" name="csrf" value="{{ csrf }}"><button type="submit">Log out</button></form>
+  </div>
+</aside>
+{% endif %}
+<header class="top">
+  <button class="menu" id="menuBtn" aria-label="Open menu">{{ icon("menu") }}</button>
+  <h1>{% block title %}{{ title }}{% endblock %}</h1>
+  {% if demo %}<span class="badge-demo" title="Example data kept in memory. Set FIREBASE_DB_URL in settings.py to use your database.">DEMO DATA</span>{% endif %}
+  <span class="badge-syn hidden" id="synBadge" title="Some bins or results are made-up (synthetic) test data">includes synthetic data</span>
+  <span class="conn" id="conn"><span class="dot"></span><span class="txt">connecting…</span></span>
+</header>
+<main class="main" id="main">
+  {% block content %}{% endblock %}
+</main>
+{% if user %}
+<nav class="bottom" aria-label="Quick">
+  {% for label, href, ic in nav[:4] %}
+  <a href="{{ href }}" class="{{ 'on' if active == href }}">{{ icon(ic) }}<span>{{ label }}</span></a>
+  {% endfor %}
+  {% if nav|length > 4 %}<button type="button" id="moreBtn">{{ icon("menu") }}<span>More</span></button>{% endif %}
+</nav>
+{% endif %}
+<div class="tip" id="tip" role="tooltip"></div>
+<script>
+  (function () {
+    var b = document.body;
+    function toggle() { b.classList.toggle("nav-open"); }
+    var m = document.getElementById("menuBtn"), mo = document.getElementById("moreBtn");
+    if (m) m.onclick = toggle;
+    if (mo) mo.onclick = toggle;
+    b.addEventListener("click", function (e) { if (b.classList.contains("nav-open") && !e.target.closest(".side,#menuBtn,#moreBtn")) b.classList.remove("nav-open"); });
+  })();
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

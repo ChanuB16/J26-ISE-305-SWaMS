@@ -1,0 +1,39 @@
+{
+  "_labels": {
+    "plastic": {"en": "Plastic", "si": "ප්ලාස්ටික්", "ta": "பிளாஸ்டிக்"},
+    "paper":   {"en": "Paper", "si": "කඩදාසි", "ta": "காகிதம்"},
+    "glass":   {"en": "Glass", "si": "වීදුරු", "ta": "கண்ணாடி"},
+    "metal":   {"en": "Metal", "si": "ලෝහ", "ta": "உலோகம்"},
+    "organic": {"en": "Organic", "si": "කාබනික", "ta": "கரிமம்"}
+  },
+  "plastic": {
+    "en": "Rinse it, remove food residue, and place it in the plastic recycling bin.",
+    "si": "සෝදා ආහාර ඉතිරි ඉවත් කර, ප්ලාස්ටික් බඳුනට දමන්න.",
+    "ta": "கழுவி, உணவுக் கழிவை அகற்றி, பிளாஸ்டிக் தொட்டியில் போடவும்."
+  },
+  "paper": {
+    "en": "Keep it dry and clean, and place it in the paper recycling bin.",
+    "si": "වියළි හා පිරිසිදුව තබා, කඩදාසි බඳුනට දමන්න.",
+    "ta": "உலர்வாகவும் சுத்தமாகவும் வைத்து, காகிதத் தொட்டியில் போடவும்."
+  },
+  "glass": {
+    "en": "If broken, wrap it safely first, then place it in the glass bin.",
+    "si": "කැඩී ඇත්නම් ආරක්ෂිතව ඔතා, වීදුරු බඳුනට දමන්න.",
+    "ta": "உடைந்திருந்தால் பாதுகாப்பாகச் சுற்றி, கண்ணாடித் தொட்டியில் போடவும்."
+  },
+  "metal": {
+    "en": "Rinse it and place it in the metal recycling bin.",
+    "si": "සෝදා ලෝහ බඳුනට දමන්න.",
+    "ta": "கழுவி, உலோகத் தொட்டியில் போடவும்."
+  },
+  "organic": {
+    "en": "Place food and garden waste in the organic bin, or use it for compost.",
+    "si": "ආහාර සහ උයන් අපද්‍රව්‍ය කාබනික බඳුනට දමන්න, නැතහොත් කොම්පෝස්ට් සඳහා යොදාගන්න.",
+    "ta": "உணவு மற்றும் தோட்டக் கழிவுகளை கரிமத் தொட்டியில் போடவும் அல்லது உரமாகப் பயன்படுத்தவும்."
+  },
+  "_unsure": {
+    "en": "Not sure. Try a clearer photo with one item in good light.",
+    "si": "විශ්වාස නැත. හොඳ ආලෝකයේ එක් අයිතමයක් සහිත පැහැදිලි ඡායාරූපයක් උත්සාහ කරන්න.",
+    "ta": "உறுதியாக இல்லை. நல்ல வெளிச்சத்தில் ஒரு பொருளுடன் தெளிவான புகைப்படத்தை முயற்சிக்கவும்."
+  }
+}

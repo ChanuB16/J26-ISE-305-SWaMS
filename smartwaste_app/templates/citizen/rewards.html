@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% from "_macros.html" import icon %}
+{% block content %}
+<div id="err"></div>
+<div class="grid g-main">
+  <div class="stack">
+    <div class="card hero" id="hero"></div>
+    <div class="card"><h2>Recent activity</h2><div id="hist"></div></div>
+  </div>
+  <div class="stack">
+    <div class="card"><h2>How to earn points</h2>
+      <table class="tbl"><tbody>
+        <tr><td>{{ icon("camera") }} Photo of sorted waste in the scanner app (AI 70%+ sure)</td><td class="num right"><b>+10</b></td></tr>
+        <tr><td>{{ icon("bin") }} Report a full bin – confirmed by its sensor (80%+)</td><td class="num right"><b>+5</b></td></tr>
+        <tr><td>{{ icon("star") }} On busy days (festivals, Poya) in that area</td><td class="num right"><b>×2</b></td></tr>
+      </tbody></table>
+    </div>
+    <div class="card"><h2>Leaderboard</h2><div id="board"></div></div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}<script type="module" src="/static/js/pages/citizen_rewards.js?v={{ version }}"></script>{% endblock %}

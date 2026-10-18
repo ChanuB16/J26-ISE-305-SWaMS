@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block content %}
+<div id="err"></div>
+<p class="muted small mb" id="src">Loading the results of the ML scripts…</p>
+<div class="tabs" id="tabs" role="tablist">
+  <button data-t="c2" class="on">Smart bin ML (Component 2)</button>
+  <button data-t="fc">Waste forecast (Component 3)</button>
+  <button data-t="rt">Truck routes (Component 3)</button>
+  <button data-t="sus">Usability (SUS)</button>
+  <button data-t="png">Saved charts</button>
+</div>
+
+<section data-p="c2">
+  <div class="card mb">
+    <div class="card-head"><h2>RQ1 · Is the smart bin's data reliable? (live, from the real bin)</h2>
+      <div class="row"><select id="rq1bin" style="width:auto"></select><select id="rq1days" style="width:auto"><option value="1">last 24 hours</option><option value="7" selected>last 7 days</option><option value="30">last 30 days</option><option value="all">all data</option></select></div></div>
+    <p class="sub">Valid reading rate per sensor, transmission success (readings received / taken, from the reading numbers) and delay from the bin to Firebase. Same numbers as tools/rq1_metrics.py.</p>
+    <div class="grid g2"><div id="rq1sensors"></div><div id="rq1tiles"></div></div>
+  </div>
+  <div class="grid g2">
+    <div class="card"><h2>RQ2 · Which model predicts the fill level 6 hours ahead best?</h2><p class="sub">Mean absolute error (MAE) in fill-% points on test days. Lower is better.</p><div id="c2models"></div><div class="scroll mt" id="c2modelsT"></div></div>
+    <div class="card"><h2>RQ2 · Overflow warnings</h2><p class="sub">Precision = warnings that were right · Recall = overflows that were warned · F1 = both together. Higher is better.</p><div id="c2over"></div><div class="scroll mt" id="c2overT"></div></div>
+    <div class="card"><h2>RQ2 · Do extra sensors help?</h2><p class="sub">MAE of the same model with more sensor inputs. Lower is better.</p><div id="c2feat"></div></div>
+    <div class="card"><h2>RQ2 · Most useful inputs</h2><p class="sub">How much worse the model gets (MAE increase) when one input is shuffled.</p><div id="c2inputs"></div></div>
+    <div class="card"><h2>RQ3 · Ranking bins for collection</h2><p class="sub">Top-5 recall: of the bins that really needed early collection, how many were in the top 5. Higher is better.</p><div id="c2urg"></div></div>
+    <div class="card"><h2>RQ4 · Sending citizens to a bin with space</h2><p class="sub">Success = the suggested bin really had space when the person arrived.</p><div id="c2near"></div><div class="scroll mt" id="c2nearT"></div></div>
+  </div>
+</section>
+
+<section data-p="fc" class="hidden">
+  <div class="grid g2">
+    <div class="card"><h2>Which forecast model is best?</h2><p class="sub">MAE in tonnes per area per day on the test months. Lower is better.</p><div id="fmodels"></div></div>
+    <div class="card"><h2>Model details</h2><div class="scroll" id="fmodelsT"></div></div>
+    <div class="card span2"><div class="card-head"><h2>Forecast vs what really happened (test period)</h2><div class="row"><select id="fzone" style="width:auto"></select><select id="fmodel" style="width:auto"></select></div></div><div id="fpred"></div></div>
+    <div class="card"><h2>Holidays, festivals, events and weather</h2><p class="sub">MAE (t) with more inputs. Lower is better.</p><div id="ffeat"></div></div>
+    <div class="card"><h2>Warning about busy (high-waste) days</h2><p class="sub">F1 / recall / precision in %. Higher is better.</p><div id="fhigh"></div></div>
+    <div class="card"><h2>Error by days ahead</h2><p class="sub">MAE (t) when forecasting 1 to 7 days ahead.</p><div id="fdays"></div></div>
+    <div class="card"><h2>Is it good in every season? (rolling check)</h2><p class="sub">MAE (t) in four different 2-month test periods.</p><div id="froll"></div></div>
+    <div class="card span2"><h2>Most useful inputs</h2><p class="sub">MAE increase (t) when one input is shuffled (top 12).</p><div id="finputs"></div></div>
+  </div>
+</section>
+
+<section data-p="rt" class="hidden">
+  <div class="grid g2">
+    <div class="card span2"><h2>30-day test: collection methods compared</h2><p class="sub">Same bins and days for every method (includes New Year and Vesak). Overflow bin-days and km: lower is better.</p><div class="scroll" id="rmethodsT"></div></div>
+    <div class="card"><h2>Distance driven (km in 30 days)</h2><div id="rkm"></div></div>
+    <div class="card"><h2>Overflowing bin-days (30 days)</h2><div id="rover"></div></div>
+    <div class="card"><h2>Trade-off: km vs overflows</h2><p class="sub">Each dot is one setting of the method (fill line in %). Bottom-left is best.</p><div id="rtrade"></div></div>
+    <div class="card"><h2>Re-planning speed (road closures)</h2><p class="sub">Seconds from the change to the new routes. Proposal target: under 5 s (NFR01).</p><div id="rreplan"></div></div>
+    <div class="card span2"><h2>km per day</h2><div id="rdaily"></div></div>
+  </div>
+</section>
+
+<section data-p="sus" class="hidden">
+  <div class="grid g3 mb" id="susK"></div>
+  <div class="grid g2">
+    <div class="card"><h2>SUS score of each answer</h2><p class="sub">0–100. Line = target {{ cfg.susTarget }} (proposal: SUS ≥ {{ cfg.susTarget }} = above average usability).</p><div id="susChart"></div></div>
+    <div class="card"><h2>Answers</h2><div class="scroll" id="susT"></div><p class="small mt"><a href="/usability">Open the questionnaire</a> · <a href="/api/export/sus.csv">Download CSV</a></p></div>
+  </div>
+</section>
+
+<section data-p="png" class="hidden">
+  <p class="muted small">The PNG charts the Python scripts saved in their results folders (good for the report).</p>
+  <div class="grid g2" id="pngs"></div>
+</section>
+{% endblock %}
+{% block scripts %}<script type="module" src="/static/js/pages/officer_analytics.js?v={{ version }}"></script>{% endblock %}

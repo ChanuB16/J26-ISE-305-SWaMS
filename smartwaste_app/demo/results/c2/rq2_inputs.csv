@@ -1,0 +1,18 @@
+,MAE increase
+fill_lag_1h,5.396
+fill,4.391
+weight,3.799
+fill_lag_6h,2.288
+fill_lag_3h,2.158
+hour_cos,2.131
+hour_sin,1.868
+hours_since_collection,1.281
+gas,0.98
+rate_6h,0.871
+weight_rate_3h,0.73
+is_weekend,0.373
+temp,0.368
+humidity,0.258
+rate_1h,0.185
+rate_3h,0.178
+day_of_week,0.168

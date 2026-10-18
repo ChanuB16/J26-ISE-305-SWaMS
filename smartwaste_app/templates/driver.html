@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% from "_macros.html" import icon %}
+{% block content %}
+<div id="err"></div>
+<div class="row between mb">
+  <div class="row"><label class="small" for="truck">Truck</label><select id="truck" style="width:auto"></select></div>
+  <span class="muted small" id="planInfo"></span>
+</div>
+<div id="changed"></div>
+<div class="grid g-main">
+  <div class="stack">
+    <div class="next-stop" id="next"></div>
+    <div class="card"><div class="card-head"><h2>Route</h2><span class="muted small" id="routeSum"></span></div><div class="map" id="map"></div></div>
+  </div>
+  <div class="stack">
+    <div class="card"><h2>Stops</h2><div id="stops"></div></div>
+    <div class="card"><h2>Emptied today</h2><p class="sub">The planner takes emptied bins off the route, so they are listed here.</p><div id="emptied"></div></div>
+    <div class="card"><h2>Problem with the truck?</h2><p class="sub">The planner moves your bins to the other trucks.</p><div id="broken"></div></div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}<script type="module" src="/static/js/pages/driver.js?v={{ version }}"></script>{% endblock %}

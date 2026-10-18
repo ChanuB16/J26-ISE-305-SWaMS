@@ -1,0 +1,6 @@
+Method,recall,precision,F1,warnings,warning line (x the 90th percentile)
+Moving average (7 days),6.2,11.9,8.1,42,1.0
+Same day last week,34.6,18.7,24.2,150,1.0
+Linear Regression,33.3,38.0,35.5,71,1.0
+Gradient Boosting (XGBoost not installed),11.1,29.0,16.1,31,1.0
+LSTM,18.5,39.5,25.2,38,1.0

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kaduwela smart bins and depot</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  html, body { margin: 0; height: 100%; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: #fcfcfb; }
+  #top { padding: 10px 16px; border-bottom: 1px solid #e1e0d9; }
+  #top h1 { margin: 0; font-size: 17px; color: #0b0b0b; }
+  #top p { margin: 4px 0 0; font-size: 13px; color: #52514e; }
+  #map { position: absolute; top: 64px; bottom: 0; left: 0; right: 0; }
+  .legend { background: #fff; padding: 8px 10px; border-radius: 6px; font-size: 12px; line-height: 18px;
+            box-shadow: 0 1px 4px rgba(0,0,0,.2); }
+  .legend i { display: inline-block; width: 14px; height: 4px; margin-right: 6px; vertical-align: middle; }
+</style></head>
+<body>
+<div id="top"><h1>Kaduwela smart bins and depot</h1><p>21 bins (20 synthetic) - click a bin for details</p></div>
+<div id="map"></div>
+<script>
+const DATA = {"center": [6.933, 79.983], "depot": {"coords": [6.933, 79.983], "name": "Council yard (Kaduwela)"}, "bins": [{"lat": 6.901313, "lng": 79.972167, "fill_color": "#898781", "popup": "<b>sim_01 - Malabe market</b><br>Malabe, market (synthetic)"}, {"lat": 6.929445, "lng": 79.968419, "fill_color": "#898781", "popup": "<b>sim_02 - Malabe bus stop</b><br>Malabe, bus stop (synthetic)"}, {"lat": 6.899752, "lng": 79.966201, "fill_color": "#898781", "popup": "<b>sim_03 - Malabe residential</b><br>Malabe, residential (synthetic)"}, {"lat": 6.907281, "lng": 79.971186, "fill_color": "#898781", "popup": "<b>sim_04 - Malabe school</b><br>Malabe, school (synthetic)"}, {"lat": 6.901503, "lng": 79.976642, "fill_color": "#898781", "popup": "<b>sim_05 - Malabe office</b><br>Malabe, office (synthetic)"}, {"lat": 6.935283, "lng": 79.98153, "fill_color": "#898781", "popup": "<b>sim_06 - Kaduwela market</b><br>Kaduwela, market (synthetic)"}, {"lat": 6.925805, "lng": 79.993912, "fill_color": "#898781", "popup": "<b>sim_07 - Kaduwela bus stop</b><br>Kaduwela, bus stop (synthetic)"}, {"lat": 6.943121, "lng": 79.992032, "fill_color": "#898781", "popup": "<b>sim_08 - Kaduwela residential</b><br>Kaduwela, residential (synthetic)"}, {"lat": 6.93057, "lng": 79.985213, "fill_color": "#898781", "popup": "<b>sim_09 - Kaduwela temple</b><br>Kaduwela, temple (synthetic)"}, {"lat": 6.908393, "lng": 79.918274, "fill_color": "#898781", "popup": "<b>sim_10 - Battaramulla office</b><br>Battaramulla, office (synthetic)"}, {"lat": 6.885797, "lng": 79.910531, "fill_color": "#898781", "popup": "<b>sim_11 - Battaramulla residential</b><br>Battaramulla, residential (synthetic)"}, {"lat": 6.900904, "lng": 79.920655, "fill_color": "#898781", "popup": "<b>sim_12 - Battaramulla market</b><br>Battaramulla, market (synthetic)"}, {"lat": 6.897751, "lng": 79.909387, "fill_color": "#898781", "popup": "<b>sim_13 - Battaramulla school</b><br>Battaramulla, school (synthetic)"}, {"lat": 6.872429, "lng": 80.000908, "fill_color": "#898781", "popup": "<b>sim_14 - Athurugiriya residential</b><br>Athurugiriya, residential (synthetic)"}, {"lat": 6.87765, "lng": 80.004266, "fill_color": "#898781", "popup": "<b>sim_15 - Athurugiriya bus stop</b><br>Athurugiriya, bus stop (synthetic)"}, {"lat": 6.871525, "lng": 79.98988, "fill_color": "#898781", "popup": "<b>sim_16 - Athurugiriya temple</b><br>Athurugiriya, temple (synthetic)"}, {"lat": 6.910518, "lng": 79.925767, "fill_color": "#898781", "popup": "<b>sim_17 - Thalangama residential</b><br>Thalangama, residential (synthetic)"}, {"lat": 6.913552, "lng": 79.927057, "fill_color": "#898781", "popup": "<b>sim_18 - Thalangama school</b><br>Thalangama, school (synthetic)"}, {"lat": 6.88752, "lng": 79.968898, "fill_color": "#898781", "popup": "<b>sim_19 - Hokandara residential</b><br>Hokandara, residential (synthetic)"}, {"lat": 6.887961, "lng": 79.968868, "fill_color": "#898781", "popup": "<b>sim_20 - Hokandara market</b><br>Hokandara, market (synthetic)"}, {"lat": 6.9147, "lng": 79.9729, "fill_color": "#898781", "popup": "<b>bin_01 - Real smart bin (Part A)</b><br>Malabe, school (real bin)"}], "routes": [], "incidents": [], "legend": []};
+const map = L.map("map").setView(DATA.center, 13);
+// background map: OpenStreetMap tiles (free, no API key)
+L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+  {maxZoom: 19, attribution: "&copy; OpenStreetMap contributors"}).addTo(map);  // free, no API key
+const all = [];
+DATA.routes.forEach(r => {
+  const line = L.polyline(r.coords, {color: r.color, weight: 5, opacity: 0.85}).addTo(map);
+  line.bindPopup(r.popup);
+  r.coords.forEach(c => all.push(c));
+});
+DATA.incidents.forEach(z => {
+  L.circle([z.lat, z.lng], {radius: z.radius, color: "#d03b3b", fillOpacity: 0.15}).addTo(map).bindPopup(z.popup);
+});
+DATA.bins.forEach(b => {
+  L.circleMarker([b.lat, b.lng], {radius: 7, color: "#0b0b0b", weight: 1.5, fillColor: b.fill_color,
+                   fillOpacity: 1}).addTo(map).bindPopup(b.popup);
+  all.push([b.lat, b.lng]);
+});
+L.marker(DATA.depot.coords, {title: DATA.depot.name}).addTo(map).bindPopup(DATA.depot.name);
+all.push(DATA.depot.coords);
+if (all.length > 1) map.fitBounds(all, {padding: [30, 30]});
+const legend = L.control({position: "bottomright"});
+legend.onAdd = function () {
+  const div = L.DomUtil.create("div", "legend");
+  div.innerHTML = DATA.legend.map(x => `<div><i style="background:${x.color}"></i>${x.label}</div>`).join("");
+  return div;
+};
+if (DATA.legend.length) legend.addTo(map);
+</script></body></html>

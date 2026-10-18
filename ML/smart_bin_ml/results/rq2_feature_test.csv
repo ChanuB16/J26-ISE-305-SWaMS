@@ -1,0 +1,5 @@
+Feature set,Inputs,MAE,RMSE,R2
+B1 fill only,7,6.671,9.366,0.863
+B2 + weight,9,6.374,9.016,0.873
+"B3 + gas, humidity, temperature",12,6.098,8.718,0.882
+"B4 + time of day, day, hours since emptied",17,5.119,7.646,0.909

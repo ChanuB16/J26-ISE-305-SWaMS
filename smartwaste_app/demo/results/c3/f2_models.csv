@@ -1,0 +1,6 @@
+Model,MAE (t),RMSE (t),R2 all areas,R2 within area,MAE % of average,MAE holidays and festivals (t),MAE normal days (t),Validation MAE (t),Train seconds
+Moving average (7 days),0.5626,0.7266,0.9376,-0.1322,4.5336,0.6207,0.5574,0.6556,0.0
+Same day last week,0.6155,0.8182,0.9209,-0.4267,4.9599,0.7357,0.6047,0.8069,0.0
+Linear Regression,0.4226,0.5538,0.9638,0.3545,3.4055,0.4091,0.4238,0.4706,0.0111
+Gradient Boosting (XGBoost not installed),0.4278,0.5609,0.9628,0.3382,3.447,0.4755,0.4235,0.5043,0.3739
+LSTM,0.4075,0.5343,0.9663,0.3905,3.2836,0.4006,0.4081,0.4419,10.5748

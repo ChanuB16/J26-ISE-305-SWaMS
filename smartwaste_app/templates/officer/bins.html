@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<div id="err"></div>
+<div class="filters">
+  <div class="seg" id="lv">
+    <button data-v="all" class="on">All <span class="muted" data-n="all"></span></button>
+    <button data-v="normal">✓ Normal <span class="muted" data-n="normal"></span></button>
+    <button data-v="filling">● Filling <span class="muted" data-n="filling"></span></button>
+    <button data-v="warning">▲ Warning <span class="muted" data-n="warning"></span></button>
+    <button data-v="critical">✖ Critical <span class="muted" data-n="critical"></span></button>
+  </div>
+  <select id="zone" aria-label="Area"><option value="">All areas</option></select>
+  <select id="sort" aria-label="Sort">
+    <option value="urgency">Sort: most urgent</option><option value="fill">Sort: fullest now</option>
+    <option value="pred">Sort: fullest in 6 h</option><option value="id">Sort: bin name</option>
+  </select>
+  <input type="search" id="q" placeholder="Search bin or place" aria-label="Search">
+  <label class="small"><input type="checkbox" id="demo" checked> show demo bins</label>
+  <a class="btn ghost small" href="/api/export/bins.csv">{% from "_macros.html" import icon %}{{ icon("download") }} CSV</a>
+</div>
+<div class="grid g-main">
+  <div class="card">
+    <div class="card-head"><h2 id="count">Bins</h2><span class="muted small">Click a bin for live sensors and history</span></div>
+    <div class="scroll" id="table"></div>
+  </div>
+  <div class="card">
+    <h2>Map</h2>
+    <div id="legend" class="mb"></div>
+    <div class="map" id="map"></div>
+    <p class="small muted mt">▮ on a fill bar = predicted fill in 6 hours (Component 2 ML).</p>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}<script type="module" src="/static/js/pages/officer_bins.js?v={{ version }}"></script>{% endblock %}

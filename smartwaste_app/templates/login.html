@@ -1,0 +1,103 @@
+{% from "_macros.html" import icon %}<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Log in · SmartWaste LK</title>
+<link rel="icon" href="/static/img/logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/static/css/app.css?v={{ version }}">
+</head>
+<body>
+{% include "_icons.html" %}
+<div class="login">
+  <section class="hero">
+    <div>
+      <div class="brand" style="padding:0"><div class="logo">{{ icon("leaf") }}</div><div><b>SmartWaste LK</b><span>Kaduwela Municipal Council</span></div></div>
+      <h1>Welcome to SmartWaste LK</h1>
+      <p>Smart bins that tell us when they are getting full, forecasts of how much waste is coming, and truck routes that change when the roads do.</p>
+      <ul class="more">
+        <li><b>Officers</b> see every bin live, the forecast and the routes, and get early warnings.</li>
+        <li><b>Drivers</b> get their next stop and mark bins as emptied.</li>
+        <li><b>Citizens</b> find the nearest bin with space, report problems and earn green points.</li>
+      </ul>
+    </div>
+    <p class="small" style="color:#a9cdb3">SLIIT IT4010 · J26-ISE-305 Intelligent Waste Management System{% if demo %} · <b style="color:#ffe08a">demo data</b>{% endif %}</p>
+  </section>
+  <section class="panel">
+    <div class="box">
+      <div class="tabs" role="tablist">
+        <button type="button" data-tab="citizen" class="{{ 'on' if tab in ('citizen', 'citizen_signup') }}">Citizen</button>
+        <button type="button" data-tab="staff" class="{{ 'on' if tab == 'staff' }}">Municipal staff</button>
+        {% if first_run %}<button type="button" data-tab="setup" class="{{ 'on' if tab == 'setup' }}">First officer account</button>{% endif %}
+      </div>
+      {% if msg %}<div class="error-bar">{{ msg }}</div>{% endif %}
+
+      <div data-panel="citizen" class="{{ '' if tab in ('citizen', 'citizen_signup') else 'hidden' }}">
+        <div class="tabs" role="tablist" style="margin-bottom:12px">
+          <button type="button" data-sub="login" class="{{ 'on' if tab != 'citizen_signup' }}">Log in</button>
+          <button type="button" data-sub="signup" class="{{ 'on' if tab == 'citizen_signup' }}">Sign up</button>
+        </div>
+
+        <form method="post" data-sub-panel="login" class="{{ '' if tab != 'citizen_signup' else 'hidden' }}">
+          <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="kind" value="citizen"><input type="hidden" name="next" value="{{ next }}">
+          <h2 style="margin-bottom:6px">Log in as a citizen</h2>
+          <p class="muted">Use the user name and password you made when you signed up.</p>
+          <div class="field"><label class="f" for="cun">User name</label><input type="text" id="cun" name="username" required autocomplete="username" autocapitalize="none" placeholder="e.g. chanuka"></div>
+          <div class="field"><label class="f" for="cpw">Password</label><input type="password" id="cpw" name="password" required autocomplete="current-password"></div>
+          <button class="btn big block" type="submit">{{ icon("user") }} Log in</button>
+        </form>
+
+        <form method="post" data-sub-panel="signup" class="{{ '' if tab == 'citizen_signup' else 'hidden' }}">
+          <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="kind" value="citizen_signup"><input type="hidden" name="next" value="{{ next }}">
+          <h2 style="margin-bottom:6px">Sign up as a citizen</h2>
+          <p class="muted">Your points, reports and scans stay with your account across devices.</p>
+          <div class="field"><label class="f" for="csn">Your name</label><input type="text" id="csn" name="name" maxlength="60" required autocomplete="nickname" placeholder="e.g. Chanuka Perera"></div>
+          <div class="field"><label class="f" for="csu">User name</label><input type="text" id="csu" name="username" required pattern="[a-z0-9_.\-]{3,30}" title="3-30 small letters, numbers, . _ -" autocapitalize="none" placeholder="e.g. chanuka"></div>
+          <div class="field"><label class="f" for="csp">Password (8 or more characters)</label><input type="password" id="csp" name="password" minlength="8" required autocomplete="new-password"></div>
+          <div class="field"><label class="f" for="csp2">Password again</label><input type="password" id="csp2" name="password2" minlength="8" required autocomplete="new-password"></div>
+          <button class="btn big block" type="submit">{{ icon("user") }} Sign up and log in</button>
+        </form>
+      </div>
+
+      <form method="post" data-panel="staff" class="{{ '' if tab == 'staff' else 'hidden' }}">
+        <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="kind" value="staff"><input type="hidden" name="next" value="{{ next }}">
+        <h2 style="margin-bottom:6px">Municipal staff log in</h2>
+        <p class="muted">Officers and truck drivers. Accounts are made by an officer on the System page.</p>
+        <div class="field"><label class="f" for="un">User name</label><input type="text" id="un" name="username" required autocomplete="username" autocapitalize="none"></div>
+        <div class="field"><label class="f" for="pw">Password</label><input type="password" id="pw" name="password" required autocomplete="current-password"></div>
+        <button class="btn big block" type="submit">Log in</button>
+      </form>
+
+      {% if first_run %}
+      <form method="post" data-panel="setup" class="{{ '' if tab == 'setup' else 'hidden' }}">
+        <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="kind" value="setup">
+        <h2 style="margin-bottom:6px">Create the first officer account</h2>
+        <p class="muted">Only once. After this, officers add other accounts on the System page.</p>
+        <div class="field"><label class="f" for="sn">Your name</label><input type="text" id="sn" name="name" maxlength="60" required></div>
+        <div class="field"><label class="f" for="su">User name</label><input type="text" id="su" name="username" required pattern="[a-z0-9_.\-]{3,30}" title="3-30 small letters, numbers, . _ -" autocapitalize="none"></div>
+        <div class="field"><label class="f" for="sp">Password (8 or more characters)</label><input type="password" id="sp" name="password" minlength="8" required autocomplete="new-password"></div>
+        <div class="field"><label class="f" for="sp2">Password again</label><input type="password" id="sp2" name="password2" minlength="8" required autocomplete="new-password"></div>
+        <button class="btn big block" type="submit">Create and log in</button>
+      </form>
+      {% endif %}
+    </div>
+  </section>
+</div>
+<script>
+  // Top-level tabs: Citizen / Staff / First officer
+  document.querySelectorAll(".tabs > button[data-tab]").forEach(function (b) {
+    b.onclick = function () {
+      document.querySelectorAll(".tabs > button[data-tab]").forEach(function (x) { x.classList.toggle("on", x === b); });
+      document.querySelectorAll("[data-panel]").forEach(function (p) { p.classList.toggle("hidden", p.dataset.panel !== b.dataset.tab); });
+    };
+  });
+  // Citizen sub-tabs: Log in / Sign up
+  document.querySelectorAll(".tabs > button[data-sub]").forEach(function (b) {
+    b.onclick = function () {
+      document.querySelectorAll(".tabs > button[data-sub]").forEach(function (x) { x.classList.toggle("on", x === b); });
+      document.querySelectorAll("[data-sub-panel]").forEach(function (f) { f.classList.toggle("hidden", f.dataset.subPanel !== b.dataset.sub); });
+    };
+  });
+</script>
+</body>
+</html>
